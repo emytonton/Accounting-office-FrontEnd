@@ -1,0 +1,30 @@
+/* ── AI LAYER ── */
+.stat-purple .stat-value { color: #7C3AED; }
+.ai-badge { margin-left: auto; background: #DC2626; color: #fff; font-size: 11px; font-family: 'Inter', sans-serif; font-weight: 700; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si.active .ai-badge { background: rgba(255,255,255,0.3); }
+.ai-card { border-left: 4px solid #D1D5DC; border-radius: 12px; padding: 16px 20px; background: #fff; border: 1px solid #F3F4F6; margin-bottom: 12px; }
+.ai-card.critico { border-left-color: #DC2626; background: #FFF5F5; }
+.ai-card.atencao { border-left-color: #EA580C; background: #FFF7ED; }
+.ai-card.aviso { border-left-color: #D97706; background: #FFFBEB; }
+.ai-score { font-family: 'Archivo', sans-serif; font-weight: 700; border-radius: 8px; padding: 4px 10px; font-size: 13px; display: inline-flex; align-items: center; }
+.ai-score.urgente { background: #FEE2E2; color: #DC2626; }
+.ai-score.moderado { background: #FEF9C3; color: #A16207; }
+.ai-score.tranquilo { background: #DCFCE7; color: #16A34A; }
+.ai-insight-box { background: #EDF5FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; }
+.health-bar-wrap { height: 12px; background: #E5E7EB; border-radius: 6px; overflow: hidden; margin: 8px 0; }
+.health-bar-fill { height: 100%; border-radius: 6px; background: #16A34A; transition: width 0.3s; }
+
+/* ── CONFIG IA ── */
+.config-section { background: #fff; border: 1px solid #F3F4F6; border-radius: 14px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
+.config-section-title { font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 16px; color: #1E2939; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #F3F4F6; }
+.config-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 16px; flex-wrap: wrap; }
+.config-label { font-size: 13px; color: #374151; font-weight: 500; }
+.config-hint { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+.weight-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.weight-label { font-size: 13px; color: #374151; width: 130px; flex-shrink: 0; }
+.weight-val { font-size: 13px; font-weight: 700; color: #2643FF; width: 40px; text-align: right; flex-shrink: 0; }
+.ai-section-title { font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 17px; color: #1E2939; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.slider-input { width: 100%; accent-color: #2643FF; }
+.previsao-table { width: 100%; border-collapse: collapse; }
+.previsao-table th { font-size: 12px; font-weight: 600; color: #6B7280; padding: 8px 12px; text-align: left; background: #F9FAFB; border-bottom: 1px solid #E5E7EB; }
+.previsao-table td { font-size: 12px; color: #4A5565; padding: 8px 12px; border-bottom: 1px solid #F3F4F6; }

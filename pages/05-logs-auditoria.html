@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1440" />
+  <title>Logs de Auditoria — Hub Accounting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #fff; min-width: 1440px; min-height: 1024px; display: flex; }
+
+    .sidebar {
+      width: 250px; min-width: 250px; height: 1024px; background: #fff;
+      border-right: 1px solid rgba(0,0,0,0.09); box-shadow: 4px 0 6px rgba(0,0,0,0.15);
+      position: relative; z-index: 10; padding-top: 180px;
+    }
+    .sidebar-nav { padding: 0 7px; display: flex; flex-direction: column; gap: 8px; }
+    .sidebar-item {
+      height: 57px; border-radius: 10px; display: flex; align-items: center; gap: 14px;
+      padding: 0 16px 0 20px; font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 20px;
+      color: #1E2939; cursor: pointer; text-decoration: none;
+    }
+    .sidebar-item:hover { background: #f0f4ff; }
+    .sidebar-item.active { background: #2643FF; color: #fff; }
+    .sidebar-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    .main { flex: 1; background: #fff; }
+    .header-band {
+      background: rgba(237,245,255,0.6); height: 163px; padding: 46px 25px 0 25px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .page-title { font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 52px; color: #155DFC; line-height: 1; }
+    .page-subtitle { font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 20px; color: #002FBB; letter-spacing: 2px; margin-top: 6px; }
+
+    .content { padding: 20px 25px 40px; }
+
+    /* Summary cards */
+    .summary-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; margin-top: 8px; }
+    .summary-card {
+      background: #fff; border: 1px solid #F3F4F6; border-radius: 14px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06); padding: 20px 22px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .summary-card .s-label { font-size: 13px; color: #6B7280; }
+    .summary-card .s-value { font-family: 'Archivo', sans-serif; font-size: 28px; font-weight: 700; color: #1E2939; }
+    .summary-card .s-sub { font-size: 12px; color: #9CA3AF; }
+    .summary-card.warn .s-value { color: #D97706; }
+    .summary-card.danger .s-value { color: #DC2626; }
+    .summary-card.blue .s-value { color: #2643FF; }
+
+    /* Filter bar */
+    .filter-bar {
+      background: #fff; border: 1px solid rgba(0,0,0,0.14); border-radius: 14px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08); padding: 18px 22px;
+      display: flex; gap: 14px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .filter-bar input, .filter-bar select {
+      background: #fff; border: 1px solid rgba(0,0,0,0.15); border-radius: 12px;
+      height: 44px; padding: 0 14px; font-family: 'Inter', sans-serif; font-size: 14px;
+      color: #364153; outline: none;
+    }
+    .filter-bar input { flex: 1; min-width: 200px; }
+    .filter-bar select { width: 180px; cursor: pointer; }
+    .filter-bar input::placeholder { color: #9CA3AF; }
+    .btn-filter {
+      background: #2643FF; color: #fff; border: none; border-radius: 10px; height: 44px;
+      padding: 0 20px; font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; white-space: nowrap;
+    }
+    .btn-export {
+      background: #fff; color: #374151; border: 1.5px solid #D1D5DC; border-radius: 10px; height: 44px;
+      padding: 0 18px; font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 14px;
+      cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+    }
+
+    /* Table */
+    .table-wrap {
+      background: #fff; border: 1px solid #F3F4F6; border-radius: 14px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06); overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #F9FAFB; border-bottom: 1px solid #E5E7EB; }
+    thead th { padding: 14px 20px; text-align: left; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; color: #364153; }
+    tbody tr { border-bottom: 1px solid #F3F4F6; transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #F9FAFB; }
+    tbody td { padding: 13px 20px; font-family: 'Inter', sans-serif; font-size: 13px; color: #4A5565; }
+
+    /* Event type badges */
+    .event-badge {
+      display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
+      border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .ev-auth    { background: #EFF6FF; color: #1D4ED8; }
+    .ev-create  { background: #ECFDF5; color: #059669; }
+    .ev-edit    { background: #FFF7ED; color: #C2410C; }
+    .ev-delete  { background: #FEF2F2; color: #DC2626; }
+    .ev-export  { background: #F5F3FF; color: #7C3AED; }
+    .ev-recibo  { background: #F0FDF4; color: #16A34A; }
+    .ev-cancel  { background: #FEE2E2; color: #B91C1C; }
+
+    .user-cell { display: flex; align-items: center; gap: 8px; }
+    .avatar {
+      width: 28px; height: 28px; border-radius: 50%; background: #EFF6FF;
+      color: #2643FF; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-family: 'Archivo', sans-serif;
+    }
+
+    .detail-text { color: #1E2939; font-weight: 500; }
+    .entity-text { color: #2643FF; font-weight: 500; }
+
+    .pagination { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-top: 1px solid #F3F4F6; }
+    .pagination span { font-size: 13px; color: #6B7280; }
+    .pagination-btns { display: flex; gap: 6px; }
+    .pg-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid #E5E7EB; background: #fff; cursor: pointer; font-size: 13px; color: #374151; display: flex; align-items: center; justify-content: center; }
+    .pg-btn.active { background: #2643FF; color: #fff; border-color: #2643FF; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <nav class="sidebar-nav">
+    <a class="sidebar-item" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor"/><rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor"/><rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor"/><rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor"/></svg></span>
+      Dashboard
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M3 21V7a2 2 0 012-2h4V3h6v2h4a2 2 0 012 2v14H3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="9" y="11" width="6" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg></span>
+      Empresas
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+      Demandas
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.5"/><path d="M7 15h4M15 15h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+      Recibos
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+      Recebimentos
+    </a>
+    <a class="sidebar-item active" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M9 12h6M9 16h4M7 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2M9 4a2 2 0 002 2h2a2 2 0 002-2M9 4a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+      Auditoria
+    </a>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="header-band">
+    <h1 class="page-title">Logs de Auditoria</h1>
+    <p class="page-subtitle">Rastreabilidade de ações críticas do sistema</p>
+  </div>
+
+  <div class="content">
+    <!-- Summary cards -->
+    <div class="summary-row">
+      <div class="summary-card blue">
+        <span class="s-label">Total de eventos hoje</span>
+        <span class="s-value">47</span>
+        <span class="s-sub">Atualizado agora</span>
+      </div>
+      <div class="summary-card">
+        <span class="s-label">Logins realizados</span>
+        <span class="s-value">12</span>
+        <span class="s-sub">Últimas 24h</span>
+      </div>
+      <div class="summary-card warn">
+        <span class="s-label">Alterações críticas</span>
+        <span class="s-value">8</span>
+        <span class="s-sub">Recibos, usuários, baixas</span>
+      </div>
+      <div class="summary-card danger">
+        <span class="s-label">Tentativas de login falhas</span>
+        <span class="s-value">3</span>
+        <span class="s-sub">Últimas 24h</span>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <input type="text" placeholder="🔍  Buscar por usuário, ação ou entidade..." />
+      <input type="date" value="2026-04-01" style="width:160px; flex:none;" />
+      <input type="date" value="2026-04-09" style="width:160px; flex:none;" />
+      <select>
+        <option value="">Todos os tipos</option>
+        <option>Autenticação</option>
+        <option>Criação</option>
+        <option>Edição</option>
+        <option>Exclusão / Inativação</option>
+        <option>Emissão de Recibo</option>
+        <option>Cancelamento</option>
+        <option>Exportação</option>
+      </select>
+      <button class="btn-filter">Filtrar</button>
+      <button class="btn-export">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Exportar CSV
+      </button>
+    </div>
+
+    <!-- Audit table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Data / Hora</th>
+            <th>Usuário</th>
+            <th>Tipo de Evento</th>
+            <th>Ação Realizada</th>
+            <th>Entidade Afetada</th>
+            <th>IP de Acesso</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>09/04/2026 14:32:07</td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar">JS</div>
+                João Silva
+              </div>
+            </td>
+            <td><span class="event-badge ev-recibo">📄 Recibo Emitido</span></td>
+            <td class="detail-text">Emitiu recibo nº REC-2026-046</td>
+            <td class="entity-text">Tech Solutions S/A</td>
+            <td>187.24.110.33</td>
+          </tr>
+          <tr>
+            <td>09/04/2026 13:15:44</td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar" style="background:#ECFDF5;color:#059669;">MS</div>
+                Maria Santos
+              </div>
+            </td>
+            <td><span class="event-badge ev-edit">✏️ Edição</span></td>
+            <td class="detail-text">Atualizou status de demanda para "Concluída"</td>
+            <td class="entity-text">Padaria São João — Folha Abr/2026</td>
+            <td>187.24.110.41</td>
+          </tr>
+          <tr>
+            <td>09/04/2026 11:48:20</td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar">JS</div>
+                João Silva
+              </div>
+            </td>
+            <td><span class="event-badge ev-create">✚ Criação</span></td>
+            <td class="detail-text">Cadastrou nova empresa</td>
+            <td class="entity-text">Mercearia do Bairro ME</td>
+            <td>187.24.110.33</td>
+          </tr>
+          <tr>
+            <td>09/04/2026 10:05:33</td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar" style="background:#FFF7ED;color:#C2410C;">CO</div>
+                Carlos Oliveira
+              </div>
+            </td>
+            <td><span class="event-badge ev-auth">🔐 Login</span></td>
+            <td class="detail-text">Autenticação realizada com sucesso</td>
+            <td class="entity-text">Sistema</td>
+            <td>177.92.55.12</td>
+          </tr>
+          <tr>
+            <td>09/04/2026 09:50:11</td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar">JS</div>
+                João Silva
+              </div>
+            </td>
+            <td><span class="event-badge ev-cancel">✕ Cancelamento</span></td>
+            <td class="detail-text">Cancelou recibo nº REC-2026-039 — "Duplicidade"</td>
+            <td class="entity-text">Construtora Brasil Ltda</td>
+            <td>187.24.110.33</td>
+          </tr>
+          <tr>
+            <td>09/04/2026 09:12:05</td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar" style="background:#F5F3FF;color:#7C3AED;">AL</div>
+                Ana Lima
+              </div>
+            </td>
+            <td><span class="event-badge ev-export">⬇ Exportação</span></td>
+            <td class="detail-text">Exportou demandas em CSV (Mar/2026)</td>
+            <td class="entity-text">Todas as empresas</td>
+            <td>201.45.88.9</td>
+          </tr>
+          <tr>
+            <td>08/04/2026 17:44:58</td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar">JS</div>
+                João Silva
+              </div>
+            </td>
+            <td><span class="event-badge ev-create">✚ Criação</span></td>
+            <td class="detail-text">Criou novo usuário: roberto.melo@contage.com.br</td>
+            <td class="entity-text">Roberto Melo</td>
+            <td>187.24.110.33</td>
+          </tr>
+          <tr>
+            <td>08/04/2026 16:22:03</td>
+            <td>
+              <div class="user-cell">
+                <div class="avatar" style="background:#ECFDF5;color:#059669;">MS</div>
+                Maria Santos
+              </div>
+            </td>
+            <td><span class="event-badge ev-auth">🔐 Logout</span></td>
+            <td class="detail-text">Encerrou sessão explicitamente</td>
+            <td class="entity-text">Sistema</td>
+            <td>187.24.110.41</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination">
+        <span>Mostrando 8 de 124 eventos — Retenção: 5 anos (RNF-010)</span>
+        <div class="pagination-btns">
+          <button class="pg-btn">‹</button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">3</button>
+          <button class="pg-btn">…</button>
+          <button class="pg-btn">16</button>
+          <button class="pg-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

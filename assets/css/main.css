@@ -1,0 +1,11 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #fff; overflow: hidden; height: 100vh; }
+button { cursor: pointer; font-family: inherit; }
+a { text-decoration: none; }
+input, select, textarea { font-family: 'Inter', sans-serif; }
+
+#app-layout { width: 100vw; height: 100vh; display: none; flex-direction: row; }
+#main-content { flex: 1; height: 100vh; overflow-y: auto; background: #fff; }
+.page { display: none; min-height: 100vh; }
+.page.active { display: block; }
+.content { padding: 22px 28px 48px; }

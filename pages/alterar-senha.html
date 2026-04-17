@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recuperar Acesso — Hub Accounting</title>
+  <link rel="icon" type="image/png" href="../assets/hub-accounting-icon.png" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #2643FF;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button {
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .box {
+      width: 540px;
+    }
+
+    /* Cabeçalho da caixa */
+    .box-back {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .box-back a {
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color .15s;
+    }
+
+    .box-back a:hover {
+      color: #fff;
+    }
+
+    .box-title {
+      font-family: 'Archivo', sans-serif;
+      font-weight: 700;
+      font-size: 40px;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+
+    .box-desc {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.5;
+      margin-bottom: 36px;
+    }
+
+    /* Campos */
+    label {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 15px;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .field {
+      width: 100%;
+      height: 55px;
+      border-radius: 12px;
+      border: 1px solid #CBD5E0;
+      background: #F7FAFC;
+      padding: 0 16px;
+      font-size: 16px;
+      color: #1E2939;
+      outline: none;
+      margin-bottom: 20px;
+    }
+
+    .field:focus {
+      border-color: #fff;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+    }
+
+    .field::placeholder {
+      color: #9CA3AF;
+    }
+
+    /* Força da senha */
+    .strength-wrap {
+      margin-top: -14px;
+      margin-bottom: 20px;
+    }
+
+    .strength-bar {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 5px;
+    }
+
+    .strength-seg {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.2);
+      transition: background .25s;
+    }
+
+    .strength-seg.weak {
+      background: #DC2626;
+    }
+
+    .strength-seg.fair {
+      background: #D97706;
+    }
+
+    .strength-seg.good {
+      background: #16A34A;
+    }
+
+    .strength-text {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Botão */
+    .btn-main {
+      width: 100%;
+      height: 60px;
+      background: #F9FAFB;
+      border: none;
+      border-radius: 20px;
+      font-family: 'Archivo', sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: #155DFC;
+      margin-top: 4px;
+      transition: opacity .15s;
+    }
+
+    .btn-main:hover {
+      opacity: .9;
+    }
+
+    .btn-main:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* Steps */
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    /* Estado de sucesso */
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .success-icon svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    /* Info e-mail enviado */
+    .email-sent-box {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      font-size: 14px;
+      color: #fff;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .email-sent-box strong {
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    /* Hint de requisitos */
+    .req-hint {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.65);
+      margin-top: -14px;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+
+    <!-- ── STEP 1: Informar e-mail ── -->
+    <div class="step active" id="step-email">
+      <div class="box-back">
+        <a href="../index.html">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+            <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          Voltar ao login
+        </a>
+      </div>
+
+      <p class="box-title">Recuperar acesso</p>
+      <p class="box-desc">Informe o e-mail cadastrado pelo administrador. Enviaremos um link para você definir sua
+        senha.</p>
+
+      <label>E-mail</label>
+      <input class="field" type="email" id="input-email" placeholder="exemplo@contage.com.br" />
+
+      <button class="btn-main" onclick="enviarLink()">Enviar link de acesso</button>
+    </div>
+
+    <!-- ── STEP 2: Link enviado (feedback) ── -->
+    <div class="step" id="step-enviado">
+      <div class="box-back">
+        <a href="#" onclick="irParaStep('step-email'); return false;">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+            <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          Informar outro e-mail
+        </a>
+      </div>
+
+      <p class="box-title">Verifique seu e-mail</p>
+      <p class="box-desc">Enviamos um link de acesso para:</p>
+
+      <div class="email-sent-box">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;">
+          <rect x="2" y="4" width="20" height="16" rx="2" stroke="#fff" stroke-width="2" />
+          <path d="M2 8l10 6 10-6" stroke="#fff" stroke-width="2" stroke-linejoin="round" />
+        </svg>
+        <div>
+          <strong id="email-display"></strong>
+          O link é válido por 30 minutos. Verifique também a caixa de spam.
+        </div>
+      </div>
+
+      <button class="btn-main" onclick="irParaStep('step-nova-senha')">Já tenho o código</button>
+    </div>
+
+    <!-- ── STEP 3: Definir nova senha ── -->
+    <div class="step" id="step-nova-senha">
+      <div class="box-back">
+        <a href="../index.html">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+            <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          Voltar ao login
+        </a>
+      </div>
+
+      <p class="box-title">Criar nova senha</p>
+      <p class="box-desc">Informe o código recebido por e-mail e defina sua nova senha.</p>
+
+      <label>Código de verificação</label>
+      <input class="field" type="text" id="input-codigo" placeholder="Ex: 847291" maxlength="6"
+        style="letter-spacing:6px;font-size:22px;text-align:center;" />
+
+      <label>Nova senha</label>
+      <input class="field" type="password" id="input-nova-senha" placeholder="Mínimo 8 caracteres"
+        oninput="avaliarForca(this.value)" />
+      <div class="strength-wrap">
+        <div class="strength-bar">
+          <div class="strength-seg" id="seg1"></div>
+          <div class="strength-seg" id="seg2"></div>
+          <div class="strength-seg" id="seg3"></div>
+          <div class="strength-seg" id="seg4"></div>
+        </div>
+        <span class="strength-text" id="strength-label"></span>
+      </div>
+
+      <label>Confirmar nova senha</label>
+      <input class="field" type="password" id="input-confirmar" placeholder="Repita a senha" />
+      <p class="req-hint">Use ao menos 8 caracteres com letras maiúsculas, minúsculas e números.</p>
+
+      <button class="btn-main" onclick="confirmarSenha()">Confirmar nova senha</button>
+    </div>
+
+    <!-- ── STEP 4: Sucesso ── -->
+    <div class="step" id="step-sucesso">
+      <div class="success-icon">
+        <svg fill="none" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" stroke="#fff" stroke-width="2" />
+          <path d="M7.5 12l3 3 6-6" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <p class="box-title">Senha definida!</p>
+      <p class="box-desc" style="margin-bottom:36px;">Sua senha foi criada com sucesso. Você já pode fazer login no
+        sistema.</p>
+      <a href="../index.html"><button class="btn-main">Ir para o login</button></a>
+    </div>
+
+  </div>
+
+  <script>
+    function irParaStep(id) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function enviarLink() {
+      const email = document.getElementById('input-email').value.trim();
+      if (!email || !email.includes('@')) {
+        alert('Informe um e-mail válido.');
+        return;
+      }
+      document.getElementById('email-display').textContent = email;
+      irParaStep('step-enviado');
+    }
+
+    function avaliarForca(senha) {
+      const segs = [document.getElementById('seg1'), document.getElementById('seg2'),
+      document.getElementById('seg3'), document.getElementById('seg4')];
+      const label = document.getElementById('strength-label');
+      segs.forEach(s => { s.className = 'strength-seg'; });
+
+      let pontos = 0;
+      if (senha.length >= 8) pontos++;
+      if (/[A-Z]/.test(senha)) pontos++;
+      if (/[0-9]/.test(senha)) pontos++;
+      if (/[^A-Za-z0-9]/.test(senha)) pontos++;
+
+      const classes = ['weak', 'fair', 'good', 'good'];
+      const labels = ['Muito fraca', 'Fraca', 'Boa', 'Forte'];
+      for (let i = 0; i < pontos; i++) segs[i].classList.add(classes[pontos - 1]);
+      label.textContent = pontos > 0 ? labels[pontos - 1] : '';
+    }
+
+    function confirmarSenha() {
+      const codigo = document.getElementById('input-codigo').value.trim();
+      const nova = document.getElementById('input-nova-senha').value;
+      const conf = document.getElementById('input-confirmar').value;
+      if (!codigo) { alert('Informe o código de verificação recebido por e-mail.'); return; }
+      if (nova.length < 8) { alert('A senha deve ter ao menos 8 caracteres.'); return; }
+      if (nova !== conf) { alert('As senhas não coincidem.'); return; }
+      irParaStep('step-sucesso');
+    }
+  </script>
+
+</body>
+
+</html>

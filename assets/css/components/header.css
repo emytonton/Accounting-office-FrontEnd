@@ -1,0 +1,23 @@
+/* ── SIDEBAR ── */
+.sidebar { width: 250px; min-width: 250px; height: 100vh; background: #fff; border-right: 1px solid rgba(0,0,0,0.09); box-shadow: 4px 0 8px rgba(0,0,0,0.12); display: flex; flex-direction: column; z-index: 10; }
+.sidebar-logo { padding: 28px 20px 18px; border-bottom: 1px solid #F3F4F6; }
+.sidebar-logo-text { font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 20px; color: #2643FF; }
+.sidebar-logo-sub { font-size: 11px; color: #9CA3AF; margin-top: 2px; letter-spacing: .5px; }
+.sidebar-nav { padding: 14px 7px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.si { height: 54px; border-radius: 10px; display: flex; align-items: center; gap: 12px; padding: 0 14px 0 18px; font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 19px; color: #1E2939; cursor: pointer; transition: background .12s; }
+.si:hover { background: #F0F4FF; }
+.si.active { background: #2643FF; color: #fff; }
+.si svg { flex-shrink: 0; opacity: .85; }
+.si.active svg { opacity: 1; }
+.sidebar-footer { padding: 14px 16px; border-top: 1px solid #F3F4F6; display: flex; align-items: center; gap: 10px; }
+.sf-avatar { width: 36px; height: 36px; border-radius: 50%; background: #EFF6FF; color: #2643FF; font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sf-info { flex: 1; min-width: 0; }
+.sf-name { font-size: 13px; font-weight: 600; color: #1E2939; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sf-role { font-size: 11px; color: #9CA3AF; }
+.sf-logout { width: 32px; height: 32px; border: none; background: #FEF2F2; border-radius: 8px; color: #DC2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sf-logout:hover { background: #FEE2E2; }
+
+/* ── HEADER BAND ── */
+.header-band { background: rgba(237,245,255,.55); height: 160px; padding: 44px 28px 0; border-bottom: 1px solid rgba(0,0,0,.04); display: flex; align-items: flex-start; justify-content: space-between; }
+.page-title { font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 48px; color: #155DFC; line-height: 1; }
+.page-subtitle { font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 18px; color: #002FBB; letter-spacing: 2px; margin-top: 6px; }

@@ -1,0 +1,19 @@
+/* ── BADGES ── */
+.badge { display: inline-flex; align-items: center; padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.b-green  { background: #DCFCE7; color: #16A34A; }
+.b-gray   { background: #F3F4F6; color: #6B7280; }
+.b-blue   { background: #DBEAFE; color: #1D4ED8; }
+.b-yellow { background: #FEF9C3; color: #A16207; }
+.b-orange { background: #FFEDD5; color: #C2410C; }
+.b-red    { background: #FEE2E2; color: #DC2626; }
+.b-purple { background: #F5F3FF; color: #7C3AED; }
+
+/* ── ACTION BUTTONS ── */
+.actions { display: flex; gap: 8px; }
+.ic-btn { width: 30px; height: 30px; border-radius: 7px; border: none; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.ic-edit { background: #EFF6FF; color: #2643FF; }
+.ic-edit:hover { background: #DBEAFE; }
+.ic-del { background: #FEF2F2; color: #DC2626; }
+.ic-del:hover { background: #FEE2E2; }
+.ic-ok { background: #DCFCE7; color: #16A34A; }
+.ic-ok:hover { background: #BBF7D0; }

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1440" />
+  <title>Tipos de Demanda — Hub Accounting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #fff; min-width: 1440px; min-height: 1024px; display: flex; }
+
+    .sidebar {
+      width: 250px; min-width: 250px; height: 1024px; background: #fff;
+      border-right: 1px solid rgba(0,0,0,0.09); box-shadow: 4px 0 6px rgba(0,0,0,0.15);
+      position: relative; z-index: 10; padding-top: 180px;
+    }
+    .sidebar-nav { padding: 0 7px; display: flex; flex-direction: column; gap: 8px; }
+    .sidebar-item {
+      height: 57px; border-radius: 10px; display: flex; align-items: center; gap: 14px;
+      padding: 0 16px 0 20px; font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 20px;
+      color: #1E2939; cursor: pointer; text-decoration: none;
+    }
+    .sidebar-item:hover { background: #f0f4ff; }
+    .sidebar-item.active { background: #2643FF; color: #fff; }
+    .sidebar-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    .main { flex: 1; background: #fff; }
+    .header-band {
+      background: rgba(237,245,255,0.6); height: 163px; padding: 46px 25px 0 25px;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .page-title { font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 52px; color: #155DFC; line-height: 1; }
+    .page-subtitle { font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 20px; color: #002FBB; letter-spacing: 2px; margin-top: 6px; }
+
+    .content { padding: 20px 25px 40px; }
+    .content-toolbar { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 16px; margin-top: 8px; align-items: center; }
+
+    .btn-primary {
+      background: #2643FF; color: #fff; border: none; border-radius: 10px; height: 48px;
+      padding: 0 22px; font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 16px;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { background: #1a35e0; }
+
+    /* Tabs por setor */
+    .tabs { display: flex; gap: 4px; margin-bottom: 22px; background: #F3F4F6; border-radius: 12px; padding: 4px; width: fit-content; }
+    .tab {
+      padding: 8px 20px; border-radius: 10px; font-size: 14px; font-weight: 500;
+      cursor: pointer; color: #6B7280; transition: all 0.15s;
+    }
+    .tab.active { background: #fff; color: #2643FF; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .tab:hover:not(.active) { color: #374151; }
+
+    /* Table */
+    .table-wrap {
+      background: #fff; border: 1px solid #F3F4F6; border-radius: 14px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #F9FAFB; border-bottom: 1px solid #E5E7EB; }
+    thead th { padding: 16px 24px; text-align: left; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; color: #364153; }
+    tbody tr { border-bottom: 1px solid #F3F4F6; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #F9FAFB; }
+    tbody td { padding: 14px 24px; font-family: 'Inter', sans-serif; font-size: 14px; color: #4A5565; }
+    td.name { font-weight: 600; color: #1E2939; }
+
+    .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+    .badge-ativo   { background: #DCFCE7; color: #16A34A; }
+    .badge-inativo { background: #FEE2E2; color: #DC2626; }
+
+    .setor-tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 8px; font-size: 12px; font-weight: 500; }
+    .setor-pessoal  { background: #FFF7ED; color: #C2410C; }
+    .setor-fiscal   { background: #ECFDF5; color: #059669; }
+    .setor-contabil { background: #EFF6FF; color: #1D4ED8; }
+
+    /* Subtask chips */
+    .subtasks { display: flex; flex-wrap: wrap; gap: 6px; }
+    .subtask-chip { background: #F3F4F6; color: #374151; padding: 3px 10px; border-radius: 20px; font-size: 12px; }
+    .subtask-empty { color: #9CA3AF; font-size: 13px; font-style: italic; }
+
+    .actions { display: flex; gap: 10px; }
+    .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; }
+    .btn-edit  { background: #EFF6FF; color: #2643FF; }
+    .btn-block { background: #FEF2F2; color: #DC2626; }
+
+    .pagination { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-top: 1px solid #F3F4F6; }
+    .pagination span { font-size: 14px; color: #6B7280; }
+    .pagination-btns { display: flex; gap: 6px; }
+    .pg-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #E5E7EB; background: #fff; cursor: pointer; font-size: 14px; color: #374151; display: flex; align-items: center; justify-content: center; }
+    .pg-btn.active { background: #2643FF; color: #fff; border-color: #2643FF; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <nav class="sidebar-nav">
+    <a class="sidebar-item" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor"/><rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor"/><rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor"/><rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor"/></svg></span>
+      Dashboard
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M3 21V7a2 2 0 012-2h4V3h6v2h4a2 2 0 012 2v14H3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="9" y="11" width="6" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg></span>
+      Empresas
+    </a>
+    <a class="sidebar-item active" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+      Demandas
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.5"/><path d="M7 15h4M15 15h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+      Recibos
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+      Recebimentos
+    </a>
+    <a class="sidebar-item" href="#">
+      <span class="sidebar-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M2 21c0-4 3.1-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+      Usuários
+    </a>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="header-band">
+    <h1 class="page-title">Tipos de Demanda</h1>
+    <p class="page-subtitle">Catálogo de obrigações e rotinas por setor</p>
+  </div>
+
+  <div class="content">
+    <div class="content-toolbar">
+      <button class="btn-primary">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        Novo Tipo de Demanda
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active">Todos</div>
+      <div class="tab">Pessoal</div>
+      <div class="tab">Fiscal</div>
+      <div class="tab">Contábil</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome da Demanda</th>
+            <th>Setor</th>
+            <th>Subtarefas</th>
+            <th>Empresas Vinculadas</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">Folha de Pagamento</td>
+            <td><span class="setor-tag setor-pessoal">Pessoal</span></td>
+            <td>
+              <div class="subtasks">
+                <span class="subtask-chip">Cálculo</span>
+                <span class="subtask-chip">Homologação</span>
+                <span class="subtask-chip">Envio eSocial</span>
+              </div>
+            </td>
+            <td>18 empresas</td>
+            <td><span class="badge badge-ativo">Ativo</span></td>
+            <td class="actions">
+              <button class="btn-icon btn-edit" title="Editar">✏️</button>
+              <button class="btn-icon btn-block" title="Inativar">🚫</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="name">FGTS Mensal</td>
+            <td><span class="setor-tag setor-pessoal">Pessoal</span></td>
+            <td>
+              <div class="subtasks">
+                <span class="subtask-chip">GFIP</span>
+                <span class="subtask-chip">SEFIP</span>
+              </div>
+            </td>
+            <td>18 empresas</td>
+            <td><span class="badge badge-ativo">Ativo</span></td>
+            <td class="actions">
+              <button class="btn-icon btn-edit">✏️</button>
+              <button class="btn-icon btn-block">🚫</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="name">DCTF Mensal</td>
+            <td><span class="setor-tag setor-fiscal">Fiscal</span></td>
+            <td>
+              <div class="subtasks">
+                <span class="subtask-chip">Apuração PIS/COFINS</span>
+                <span class="subtask-chip">Transmissão</span>
+              </div>
+            </td>
+            <td>24 empresas</td>
+            <td><span class="badge badge-ativo">Ativo</span></td>
+            <td class="actions">
+              <button class="btn-icon btn-edit">✏️</button>
+              <button class="btn-icon btn-block">🚫</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="name">Apuração Simples Nacional</td>
+            <td><span class="setor-tag setor-fiscal">Fiscal</span></td>
+            <td>
+              <div class="subtasks">
+                <span class="subtask-chip">DAS</span>
+              </div>
+            </td>
+            <td>31 empresas</td>
+            <td><span class="badge badge-ativo">Ativo</span></td>
+            <td class="actions">
+              <button class="btn-icon btn-edit">✏️</button>
+              <button class="btn-icon btn-block">🚫</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="name">Balancete Mensal</td>
+            <td><span class="setor-tag setor-contabil">Contábil</span></td>
+            <td><span class="subtask-empty">— Sem subtarefas —</span></td>
+            <td>12 empresas</td>
+            <td><span class="badge badge-ativo">Ativo</span></td>
+            <td class="actions">
+              <button class="btn-icon btn-edit">✏️</button>
+              <button class="btn-icon btn-block">🚫</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="name">DIRF Anual</td>
+            <td><span class="setor-tag setor-fiscal">Fiscal</span></td>
+            <td>
+              <div class="subtasks">
+                <span class="subtask-chip">Consolidação</span>
+                <span class="subtask-chip">Transmissão</span>
+              </div>
+            </td>
+            <td>18 empresas</td>
+            <td><span class="badge badge-inativo">Inativo</span></td>
+            <td class="actions">
+              <button class="btn-icon btn-edit">✏️</button>
+              <button class="btn-icon btn-edit" style="color:#16A34A;background:#DCFCE7;">↩️</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination">
+        <span>Mostrando 6 de 14 tipos de demanda</span>
+        <div class="pagination-btns">
+          <button class="pg-btn">‹</button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">3</button>
+          <button class="pg-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+/* ── BUTTONS ── */
+.btn { display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 10px; font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 15px; height: 46px; padding: 0 22px; transition: opacity .15s; }
+.btn:hover { opacity: .88; }
+.btn-primary { background: #2643FF; color: #fff; }
+.btn-secondary { background: #fff; color: #374151; border: 1.5px solid #D1D5DC; }
+.btn-secondary:hover { background: #F9FAFB; }
+.btn-danger { background: #FEF2F2; color: #DC2626; border: 1.5px solid #FECACA; }
+.btn-sm { height: 36px; padding: 0 14px; font-size: 13px; border-radius: 8px; }
+
+/* ── TOOLBAR ── */
+.toolbar { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 18px; align-items: center; }
+.toolbar-left { margin-right: auto; display: flex; gap: 10px; align-items: center; }
