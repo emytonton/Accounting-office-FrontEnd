@@ -4,7 +4,8 @@ import { login } from '../api/authService'
 import { useAuth } from '../context/AuthContext'
 
 const GENERIC_ERROR = 'E-mail ou senha incorretos. Verifique suas credenciais e tente novamente.'
-const LOCKOUT_ERROR = 'Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.'
+const LOCKOUT_ERROR = 'Muitas tentativas. Aguarde 15 minutos antes de tentar novamente.'
+const ACCESS_DENIED_ERROR = 'Acesso negado. Você não tem permissão para acessar o sistema.'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -37,6 +38,11 @@ export default function Login() {
         setError(LOCKOUT_ERROR)
       } else if (code === 'FIRST_ACCESS_REQUIRED') {
         navigate('/recuperar-senha', { state: { firstAccess: true, email: identifier } })
+      } else if (code === 'ACCESS_DENIED' || status === 403) {
+        setError(ACCESS_DENIED_ERROR)
+      } else if (code === 'VALIDATION_ERROR' || status === 400) {
+        const msg = err.response?.data?.message
+        setError(msg || 'Dados inválidos. Verifique o e-mail informado.')
       } else {
         setError(GENERIC_ERROR)
       }

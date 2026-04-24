@@ -2,7 +2,7 @@ import api from './api'
 
 export async function login(identifier, password) {
   const { data } = await api.post('/auth/login', { identifier, password })
-  return data
+  return data.data
 }
 
 export async function logout() {
