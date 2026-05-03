@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
-import { listUsers } from '../api/userService'
+import { Icon } from '../components/icons'
+import { listUsers, inactivateUser, reactivateUser } from '../api/userService'
 import { useAuth } from '../context/AuthContext'
 
 const PAGE_SIZE = 10
@@ -33,6 +34,7 @@ export default function Users() {
   const [filterStatus, setFilterStatus] = useState('')
   const [filterRole, setFilterRole] = useState('')
   const [page, setPage] = useState(1)
+  const [actionLoading, setActionLoading] = useState(null)
 
   useEffect(() => {
     async function fetchUsers() {
@@ -50,6 +52,32 @@ export default function Users() {
     fetchUsers()
   }, [user?.tenantId])
 
+  async function handleInactivate(id) {
+    setActionLoading(id)
+    try {
+      await inactivateUser(id)
+      setUsers((prev) => prev.map((u) => u.id === id ? { ...u, isActive: false } : u))
+    } catch (err) {
+      console.error('inactivateUser error:', err.response?.status, err.response?.data)
+      const msg = err.response?.data?.error?.message
+      setError(msg || 'Não foi possível inativar o usuário. Tente novamente.')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  async function handleReactivate(id) {
+    setActionLoading(id)
+    try {
+      await reactivateUser(id)
+      setUsers((prev) => prev.map((u) => u.id === id ? { ...u, isActive: true } : u))
+    } catch {
+      setError('Não foi possível reativar o usuário. Tente novamente.')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
     return users.filter((u) => {
@@ -57,7 +85,7 @@ export default function Users() {
         !q ||
         u.name?.toLowerCase().includes(q) ||
         u.identifier?.toLowerCase().includes(q)
-      const matchStatus = !filterStatus || (u.status || '').toLowerCase() === filterStatus
+      const matchStatus = !filterStatus || u.isActive === (filterStatus === 'ativo')
       const matchRole = !filterRole || u.role === filterRole || u.sector === filterRole
       return matchSearch && matchStatus && matchRole
     })
@@ -66,20 +94,9 @@ export default function Users() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  function handleSearchChange(e) {
-    setSearch(e.target.value)
-    setPage(1)
-  }
-
-  function handleStatusChange(e) {
-    setFilterStatus(e.target.value)
-    setPage(1)
-  }
-
-  function handleRoleChange(e) {
-    setFilterRole(e.target.value)
-    setPage(1)
-  }
+  function handleSearchChange(e) { setSearch(e.target.value); setPage(1) }
+  function handleStatusChange(e) { setFilterStatus(e.target.value); setPage(1) }
+  function handleRoleChange(e) { setFilterRole(e.target.value); setPage(1) }
 
   return (
     <div className="app-layout">
@@ -96,9 +113,7 @@ export default function Users() {
         <div className="content">
           <div className="toolbar">
             <button className="btn btn-primary" onClick={() => navigate('/usuarios/novo')}>
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
+              <Icon name="add" size={18} />
               Novo Usuário
             </button>
           </div>
@@ -107,7 +122,7 @@ export default function Users() {
             <input
               className="fi fi-grow"
               type="text"
-              placeholder="🔍  Buscar por nome ou e-mail..."
+              placeholder="Buscar por nome ou e-mail..."
               value={search}
               onChange={handleSearchChange}
             />
@@ -125,7 +140,11 @@ export default function Users() {
             </select>
           </div>
 
-          {error && <div className="alert-error"><span>⚠️</span> {error}</div>}
+          {error && (
+            <div className="alert-error">
+              <Icon name="warning" size={18} /> {error}
+            </div>
+          )}
 
           <div className="table-wrap">
             <table>
@@ -154,8 +173,8 @@ export default function Users() {
                 ) : (
                   paginated.map((u) => {
                     const { label, cls } = perfilInfo(u.role, u.sector)
-                    const isActive = (u.status || 'ativo').toLowerCase() === 'ativo'
-                    const isPending = (u.status || '').toLowerCase() === 'pendente'
+                    const isActive = u.isActive !== false
+                    const isPending = false
 
                     return (
                       <tr key={u.id || u._id}>
@@ -175,11 +194,31 @@ export default function Users() {
                         </td>
                         <td>
                           <div className="actions">
-                            <button className="btn-icon btn-edit" title="Editar">✏️</button>
+                            <button
+                              className="btn-icon btn-edit"
+                              title="Editar"
+                              onClick={() => navigate(`/usuarios/${u.id || u._id}/editar`, { state: { user: u } })}
+                            >
+                              <Icon name="edit" size={16} />
+                            </button>
                             {isActive ? (
-                              <button className="btn-icon btn-block" title="Inativar">🚫</button>
+                              <button
+                                className="btn-icon btn-block"
+                                title="Inativar"
+                                disabled={actionLoading === u.id}
+                                onClick={() => handleInactivate(u.id)}
+                              >
+                                <Icon name="block" size={16} />
+                              </button>
                             ) : (
-                              <button className="btn-icon btn-reactivate" title="Reativar">↩️</button>
+                              <button
+                                className="btn-icon btn-reactivate"
+                                title="Reativar"
+                                disabled={actionLoading === u.id}
+                                onClick={() => handleReactivate(u.id)}
+                              >
+                                <Icon name="restore" size={16} />
+                              </button>
                             )}
                           </div>
                         </td>
