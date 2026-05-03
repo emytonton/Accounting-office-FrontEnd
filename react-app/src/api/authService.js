@@ -6,9 +6,12 @@ export async function login(identifier, password) {
 }
 
 export async function logout() {
-  await api.post('/auth/logout')
-  localStorage.removeItem('token')
-  localStorage.removeItem('user')
+  try {
+    await api.post('/auth/logout')
+  } finally {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+  }
 }
 
 export async function forgotPassword(email) {
