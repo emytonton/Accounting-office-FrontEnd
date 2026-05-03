@@ -9,7 +9,11 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Users from './pages/Users'
 import NewUser from './pages/NewUser'
+import EditUser from './pages/EditUser'
 import Dashboard from './pages/Dashboard'
+import Companies from './pages/Companies'
+import NewCompany from './pages/NewCompany'
+import EditCompany from './pages/EditCompany'
 
 export default function App() {
   return (
@@ -25,11 +29,15 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/usuarios" element={<Users />} />
             <Route path="/usuarios/novo" element={<NewUser />} />
+            <Route path="/usuarios/:id/editar" element={<EditUser />} />
 
             <Route path="/dashboard" element={<Dashboard />} />
 
+            <Route path="/empresas" element={<Companies />} />
+            <Route path="/empresas/nova" element={<NewCompany />} />
+            <Route path="/empresas/:id/editar" element={<EditCompany />} />
+
             {/* Placeholder routes for other sidebar pages */}
-            <Route path="/empresas" element={<PlaceholderPage title="Empresas" />} />
             <Route path="/demandas" element={<PlaceholderPage title="Demandas" />} />
             <Route path="/recibos" element={<PlaceholderPage title="Recibos" />} />
             <Route path="/recebimentos" element={<PlaceholderPage title="Recebimentos" />} />
