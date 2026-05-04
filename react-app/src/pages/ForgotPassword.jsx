@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { forgotPassword, validateResetCode, resetPassword } from '../api/authService'
 import PasswordStrength from '../components/PasswordStrength'
+import { Icon } from '../components/icons'
 
 const GENERIC_SUCCESS = 'Se o e-mail estiver cadastrado no sistema, você receberá um código em instantes. Verifique também a caixa de spam.'
 
@@ -13,14 +14,6 @@ const backLinkStyle = {
   fontSize: 14,
   marginBottom: 32,
   transition: 'color .15s',
-}
-
-function BackArrow() {
-  return (
-    <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-      <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
 }
 
 export default function ForgotPassword() {
@@ -127,10 +120,7 @@ export default function ForgotPassword() {
       <div className="auth-screen">
         <div className="auth-box">
           <div className="success-icon">
-            <svg width="40" height="40" fill="none" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="2" />
-              <path d="M7.5 12l3 3 6-6" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <Icon name="checkCircle" size={48} fill={1} style={{ color: '#fff' }} />
           </div>
           <p className="auth-title">Senha definida!</p>
           <p className="auth-desc" style={{ marginBottom: 36 }}>
@@ -154,7 +144,7 @@ export default function ForgotPassword() {
       <div className="auth-screen">
         <div className="auth-box">
           <Link to="/login" style={backLinkStyle}>
-            <BackArrow /> Voltar ao login
+            <Icon name="arrowBack" size={16} /> Voltar ao login
           </Link>
 
           <p className="auth-title" style={{ fontSize: 32 }}>
@@ -204,7 +194,7 @@ export default function ForgotPassword() {
         <div className="auth-box">
           {!isFirstAccessFlow && (
             <button className="auth-back" onClick={() => setStep('sent')}>
-              <BackArrow /> Voltar
+              <Icon name="arrowBack" size={16} /> Voltar
             </button>
           )}
 
@@ -250,17 +240,14 @@ export default function ForgotPassword() {
       <div className="auth-screen">
         <div className="auth-box">
           <button className="auth-back" onClick={() => setStep('email')}>
-            <BackArrow /> Informar outro e-mail
+            <Icon name="arrowBack" size={16} /> Informar outro e-mail
           </button>
 
           <p className="auth-title" style={{ fontSize: 36 }}>Verifique seu e-mail</p>
           <p className="auth-desc">{GENERIC_SUCCESS}</p>
 
           <div className="auth-info-box">
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: 2 }}>
-              <rect x="2" y="4" width="20" height="16" rx="2" stroke="#fff" strokeWidth="2" />
-              <path d="M2 8l10 6 10-6" stroke="#fff" strokeWidth="2" strokeLinejoin="round" />
-            </svg>
+            <Icon name="email" size={20} style={{ flexShrink: 0, marginTop: 2 }} />
             <div>
               <strong>{email}</strong>
               O código é válido por 24 horas.
@@ -280,7 +267,7 @@ export default function ForgotPassword() {
     <div className="auth-screen">
       <div className="auth-box">
         <Link to="/login" style={backLinkStyle}>
-          <BackArrow /> Voltar ao login
+          <Icon name="arrowBack" size={16} /> Voltar ao login
         </Link>
 
         <p className="auth-title" style={{ fontSize: 36 }}>Recuperar acesso</p>

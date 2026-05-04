@@ -247,8 +247,10 @@ input, select, textarea { font-family: 'Inter', sans-serif; }
 
 .si:hover { background: #F0F4FF; color: #1E2939; }
 .si.active { background: #2643FF; color: #fff; }
-.si svg { flex-shrink: 0; opacity: 0.85; }
-.si.active svg { opacity: 1; }
+.si svg,
+.si .material-symbols-rounded { flex-shrink: 0; opacity: 0.85; }
+.si.active svg,
+.si.active .material-symbols-rounded { opacity: 1; }
 
 .sidebar-footer {
   padding: 14px 16px;
@@ -562,6 +564,19 @@ td.name {
   margin-bottom: 24px;
   padding-bottom: 12px;
   border-bottom: 1px solid #F3F4F6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── MATERIAL SYMBOLS ── */
+.material-symbols-rounded {
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
 }
 
 .form-grid {
