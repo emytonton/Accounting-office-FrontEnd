@@ -8,11 +8,11 @@ import { useAuth } from '../context/AuthContext'
 const PAGE_SIZE = 10
 
 const PERFIL_MAP = {
-  admin: { label: 'Administrador', cls: 'admin' },
-  collaborator: { label: 'Colaborador', cls: '' },
-  fiscal: { label: 'Colaborador — Fiscal', cls: 'fiscal' },
-  pessoal: { label: 'Colaborador — Pessoal', cls: 'pessoal' },
-  contabil: { label: 'Colaborador — Contábil + Fiscal', cls: 'contabil' },
+  admin:       { label: 'Administrador',              cls: 'b-purple' },
+  collaborator:{ label: 'Colaborador',                cls: 'b-gray' },
+  fiscal:      { label: 'Colaborador — Fiscal',       cls: 'b-orange' },
+  pessoal:     { label: 'Colaborador — Pessoal',      cls: 'b-blue' },
+  contabil:    { label: 'Colaborador — Contábil',     cls: 'b-green' },
 }
 
 function perfilInfo(role, sector) {
@@ -178,46 +178,46 @@ export default function Users() {
 
                     return (
                       <tr key={u.id || u._id}>
-                        <td className="name">{u.name}</td>
+                        <td className="fw">{u.name}</td>
                         <td>{u.identifier || u.email}</td>
                         <td>
-                          <span className={`perfil-tag ${cls}`}>{label}</span>
+                          <span className={`badge ${cls}`}>{label}</span>
                         </td>
                         <td>
                           {isPending ? (
-                            <span className="badge badge-pendente">Pendente</span>
+                            <span className="badge b-yellow">Pendente</span>
                           ) : isActive ? (
-                            <span className="badge badge-ativo">Ativo</span>
+                            <span className="badge b-green">Ativo</span>
                           ) : (
-                            <span className="badge badge-inativo">Inativo</span>
+                            <span className="badge b-gray">Inativo</span>
                           )}
                         </td>
                         <td>
                           <div className="actions">
                             <button
-                              className="btn-icon btn-edit"
+                              className="ic-btn ic-edit"
                               title="Editar"
                               onClick={() => navigate(`/usuarios/${u.id || u._id}/editar`, { state: { user: u } })}
                             >
-                              <Icon name="edit" size={16} />
+                              <Icon name="edit" size={15} />
                             </button>
                             {isActive ? (
                               <button
-                                className="btn-icon btn-block"
+                                className="ic-btn ic-del"
                                 title="Inativar"
                                 disabled={actionLoading === u.id}
                                 onClick={() => handleInactivate(u.id)}
                               >
-                                <Icon name="block" size={16} />
+                                <Icon name="block" size={15} />
                               </button>
                             ) : (
                               <button
-                                className="btn-icon btn-reactivate"
+                                className="ic-btn ic-ok"
                                 title="Reativar"
                                 disabled={actionLoading === u.id}
                                 onClick={() => handleReactivate(u.id)}
                               >
-                                <Icon name="restore" size={16} />
+                                <Icon name="restore" size={15} />
                               </button>
                             )}
                           </div>

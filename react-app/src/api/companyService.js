@@ -1,5 +1,10 @@
 import api from './api'
 
+export async function getCompany(id) {
+  const { data } = await api.get(`/companies/${id}`)
+  return data.data
+}
+
 export async function listCompanies(tenantId, filters = {}) {
   const { data } = await api.get('/companies', { params: { tenantId, ...filters } })
   return data.data
