@@ -2,7 +2,6 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
-import Sidebar from './components/Sidebar'
 
 import Login from './pages/Login'
 import ForgotPassword from './pages/ForgotPassword'
@@ -14,6 +13,10 @@ import Dashboard from './pages/Dashboard'
 import Companies from './pages/Companies'
 import NewCompany from './pages/NewCompany'
 import EditCompany from './pages/EditCompany'
+import CompanyLinks from './pages/CompanyLinks'
+import Demands from './pages/Demands'
+import DemandDetail from './pages/DemandDetail'
+import AuditLogs from './pages/AuditLogs'
 
 export default function App() {
   return (
@@ -27,20 +30,23 @@ export default function App() {
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+
             <Route path="/usuarios" element={<Users />} />
             <Route path="/usuarios/novo" element={<NewUser />} />
             <Route path="/usuarios/:id/editar" element={<EditUser />} />
 
-            <Route path="/dashboard" element={<Dashboard />} />
-
             <Route path="/empresas" element={<Companies />} />
             <Route path="/empresas/nova" element={<NewCompany />} />
             <Route path="/empresas/:id/editar" element={<EditCompany />} />
+            <Route path="/empresas/:id/vinculos" element={<CompanyLinks />} />
 
-            {/* Placeholder routes for other sidebar pages */}
-            <Route path="/demandas" element={<PlaceholderPage title="Demandas" />} />
-            <Route path="/recibos" element={<PlaceholderPage title="Recibos" />} />
-            <Route path="/recebimentos" element={<PlaceholderPage title="Recebimentos" />} />
+            <Route path="/tipos-demanda" element={<Navigate to="/demandas" replace />} />
+
+            <Route path="/demandas" element={<Demands />} />
+            <Route path="/demandas/:id" element={<DemandDetail />} />
+
+            <Route path="/auditoria" element={<AuditLogs />} />
           </Route>
 
           {/* Default redirect */}
@@ -49,24 +55,5 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
-  )
-}
-
-function PlaceholderPage({ title }) {
-  return (
-    <div className="app-layout">
-      <Sidebar />
-      <main className="main-content">
-        <div className="header-band">
-          <div className="header-left">
-            <h1 className="page-title">{title}</h1>
-            <p className="page-subtitle">Em desenvolvimento</p>
-          </div>
-        </div>
-        <div className="content">
-          <p className="empty-state">Esta página ainda não foi implementada.</p>
-        </div>
-      </main>
-    </div>
   )
 }

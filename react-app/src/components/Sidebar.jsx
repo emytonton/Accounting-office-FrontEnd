@@ -4,17 +4,17 @@ import { useAuth } from '../context/AuthContext'
 import { Icon } from './icons'
 
 const NAV_ITEMS = [
-  { label: 'Dashboard',    to: '/dashboard',    iconName: 'dashboard' },
-  { label: 'Empresas',     to: '/empresas',     iconName: 'business' },
-  { label: 'Demandas',     to: '/demandas',     iconName: 'assignment' },
-  { label: 'Recibos',      to: '/recibos',      iconName: 'receipt' },
-  { label: 'Recebimentos', to: '/recebimentos', iconName: 'payments' },
-  { label: 'Usuários',     to: '/usuarios',     iconName: 'users' },
+  { label: 'Dashboard',        to: '/dashboard',     iconName: 'dashboard' },
+  { label: 'Empresas',         to: '/empresas',      iconName: 'business' },
+  { label: 'Demandas',         to: '/demandas',      iconName: 'assignment' },
+  { label: 'Auditoria',        to: '/auditoria',     iconName: 'audit',   adminOnly: true },
+  { label: 'Usuários',         to: '/usuarios',      iconName: 'users' },
 ]
 
 export default function Sidebar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const isAdmin = user?.role === 'admin'
 
   async function handleLogout() {
     await logout()
@@ -33,7 +33,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        {NAV_ITEMS.map((item) => (
+        {NAV_ITEMS.filter(item => !item.adminOnly || isAdmin).map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
