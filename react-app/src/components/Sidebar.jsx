@@ -7,7 +7,9 @@ const NAV_ITEMS = [
   { label: 'Dashboard',        to: '/dashboard',     iconName: 'dashboard' },
   { label: 'Empresas',         to: '/empresas',      iconName: 'business' },
   { label: 'Demandas',         to: '/demandas',      iconName: 'assignment' },
-  { label: 'Auditoria',        to: '/auditoria',     iconName: 'audit',   adminOnly: true },
+  { label: 'Recibos',          to: '/recibos',       iconName: 'receipt' },
+  { label: 'Exportar',         to: '/exportar',      iconName: 'exportData', adminOnly: true },
+  { label: 'Auditoria',        to: '/auditoria',     iconName: 'audit',      adminOnly: true },
   { label: 'Usuários',         to: '/usuarios',      iconName: 'users' },
 ]
 

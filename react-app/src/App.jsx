@@ -16,6 +16,9 @@ import EditCompany from './pages/EditCompany'
 import CompanyLinks from './pages/CompanyLinks'
 import Demands from './pages/Demands'
 import DemandDetail from './pages/DemandDetail'
+import Receipts from './pages/Receipts'
+import ReceiptDetail from './pages/ReceiptDetail'
+import Export from './pages/Export'
 import AuditLogs from './pages/AuditLogs'
 
 export default function App() {
@@ -46,6 +49,11 @@ export default function App() {
             <Route path="/demandas" element={<Demands />} />
             <Route path="/demandas/:id" element={<DemandDetail />} />
 
+            <Route path="/recibos" element={<Receipts />} />
+            <Route path="/recibos/:id" element={<ReceiptDetail />} />
+            <Route path="/recebimentos" element={<Navigate to="/recibos" replace />} />
+
+            <Route path="/exportar" element={<Export />} />
             <Route path="/auditoria" element={<AuditLogs />} />
           </Route>
 

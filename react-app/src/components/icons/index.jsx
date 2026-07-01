@@ -33,6 +33,9 @@ export const ICONS = {
   folder:         'folder',
   subtask:        'checklist',
   calendar:       'calendar_month',
+  // Financial
+  download:       'download',
+  exportData:     'export_notes',
   // Auth
   arrowBack:      'arrow_back',
   email:          'mail',
