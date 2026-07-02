@@ -6,6 +6,7 @@ import { listCompanies } from '../api/companyService'
 import { listDemands } from '../api/demandService'
 import { listReceipts } from '../api/receiptService'
 import { listDemandTypes } from '../api/demandTypeService'
+import { useAuth } from '../context/AuthContext'
 
 const MONTH_NAMES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -39,8 +40,8 @@ const CIRC = 2 * Math.PI * 40
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const user = useMemo(() => JSON.parse(localStorage.getItem('user') || '{}'), [])
-  const tenantId = user.tenantId
+  const { user } = useAuth()
+  const tenantId = user?.tenantId
 
   const now = new Date()
   const [competence, setCompetence] = useState({ month: now.getMonth() + 1, year: now.getFullYear() })
@@ -60,7 +61,7 @@ export default function Dashboard() {
       setLoading(true)
       const [sRes, cRes, dRes, rRes, tRes] = await Promise.allSettled([
         getDashboardStats(tenantId, competence.month, competence.year),
-        listCompanies(tenantId, { isActive: true, limit: 1000 }),
+        listCompanies(tenantId, { situation: 'active', limit: 1000 }),
         listDemands({ tenantId, competenceMonth: competence.month, competenceYear: competence.year, limit: 500 }),
         listReceipts(tenantId, { competenceMonth: competence.month, competenceYear: competence.year }),
         listDemandTypes({ tenantId }),
