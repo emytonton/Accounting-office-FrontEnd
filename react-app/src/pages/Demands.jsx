@@ -369,26 +369,34 @@ export default function Demands() {
   const [filterActive, setFilterActive] = useState('')
   const [modal, setModal]               = useState(null)
 
-  /* Load companies + types map for lista tab (also seeds types list) */
+  /* Load companies + types map for lista tab (also seeds types list).
+     Carrega cada lookup independentemente: falha em um nao impacta o outro. */
   useEffect(() => {
     async function loadLookups() {
-      try {
-        const [compResult, typesData] = await Promise.all([
-          listCompanies(user?.tenantId, { limit: 500 }),
-          listDemandTypes(),
-        ])
+      const [compResult, typesResult] = await Promise.allSettled([
+        listCompanies(user?.tenantId, { limit: 500 }),
+        listDemandTypes(),
+      ])
+
+      if (compResult.status === 'fulfilled') {
+        const value = compResult.value
+        const compList = value?.items ?? (Array.isArray(value) ? value : [])
         const cMap = {}
-        const compList = compResult?.items ?? (Array.isArray(compResult) ? compResult : [])
         compList.forEach(c => { cMap[c.id] = c.name })
-
-        const tMap = {}
-        const tArr = Array.isArray(typesData) ? typesData : []
-        tArr.forEach(t => { tMap[t.id] = { name: t.name, sector: t.sector } })
-
         setCompaniesMap(cMap)
+      } else {
+        console.error('[Demands] listCompanies failed:', compResult.reason)
+      }
+
+      if (typesResult.status === 'fulfilled') {
+        const tArr = Array.isArray(typesResult.value) ? typesResult.value : []
+        const tMap = {}
+        tArr.forEach(t => { tMap[t.id] = { name: t.name, sector: t.sector } })
         setTypesMap(tMap)
         setTypes(tArr)
-      } catch {}
+      } else {
+        console.error('[Demands] listDemandTypes failed:', typesResult.reason)
+      }
     }
     loadLookups()
   }, [user?.tenantId])
@@ -479,7 +487,7 @@ export default function Demands() {
                 </button>
                 <button
                   className={`tab${tab === 'tipos' ? ' act' : ''}`}
-                  onClick={() => setTab('tipos')}
+                  onClick={() => { setTab('tipos'); reloadTypes() }}
                 >
                   Tipos de Demanda
                 </button>
