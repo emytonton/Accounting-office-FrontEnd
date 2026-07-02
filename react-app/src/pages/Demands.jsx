@@ -23,13 +23,13 @@ const STATUS_MAP = {
   overdue:     { label: 'Atrasada',     cls: 'b-red' },
 }
 
-const SECTOR_BADGE = { fiscal: 'b-orange', pessoal: 'b-blue', contabil: 'b-purple' }
-const SECTOR_LABEL = { fiscal: 'Fiscal', pessoal: 'Pessoal', contabil: 'Contábil' }
+const SECTOR_BADGE = { Fiscal: 'b-orange', DP: 'b-blue', 'Contábil': 'b-purple' }
+const SECTOR_LABEL = { Fiscal: 'Fiscal', DP: 'Pessoal', 'Contábil': 'Contábil' }
 
 const SECTORS = [
-  { value: 'fiscal',   label: 'Fiscal' },
-  { value: 'pessoal',  label: 'Pessoal' },
-  { value: 'contabil', label: 'Contábil' },
+  { value: 'Fiscal',   label: 'Fiscal' },
+  { value: 'DP',       label: 'Pessoal' },
+  { value: 'Contábil', label: 'Contábil' },
 ]
 
 function formatDate(iso) {
@@ -599,7 +599,7 @@ export default function Demands() {
                       return (
                         <tr key={d.id}>
                           <td className="fw">
-                            {companiesMap[d.companyId] ?? d.companyId?.slice(0, 8)}
+                            {companiesMap[d.companyId] ?? '—'}
                           </td>
                           <td>{typesMap[d.demandTypeId]?.name ?? '—'}</td>
                           <td>
@@ -703,7 +703,7 @@ export default function Demands() {
                         </td>
                       </tr>
                     ) : filteredTypes.map(t => {
-                      const sectorBadge = { fiscal: 'b-orange', pessoal: 'b-blue', contabil: 'b-purple' }
+                      const sectorBadge = { Fiscal: 'b-orange', DP: 'b-blue', 'Contábil': 'b-purple' }
                       return (
                         <tr key={t.id}>
                           <td className="fw">{t.name}</td>

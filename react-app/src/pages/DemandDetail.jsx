@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useLocation, Link } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { Icon } from '../components/icons'
-import { getDemand, updateDemandStatus, updateSubtask } from '../api/demandService'
+import { getDemand, updateDemandStatus, updateSubtask, updateDueDate } from '../api/demandService'
+import { useAuth } from '../context/AuthContext'
 
 const MONTHS = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -31,6 +32,8 @@ function formatDate(iso) {
 export default function DemandDetail() {
   const { id } = useParams()
   const { state } = useLocation()
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'admin'
 
   const [demand, setDemand]       = useState(null)
   const [loading, setLoading]     = useState(true)
@@ -42,6 +45,12 @@ export default function DemandDetail() {
   const [statusSuccess, setStatusSuccess] = useState(false)
 
   const [subtaskLoading, setSubtaskLoading] = useState(null)
+
+  const [showDueDate, setShowDueDate]   = useState(false)
+  const [newDueDate, setNewDueDate]     = useState('')
+  const [dueDateSaving, setDueDateSaving] = useState(false)
+  const [dueDateError, setDueDateError]   = useState('')
+  const [dueDateSuccess, setDueDateSuccess] = useState(false)
 
   async function load() {
     setLoading(true)
@@ -91,6 +100,25 @@ export default function DemandDetail() {
     }
   }
 
+  async function handleDueDateSave() {
+    setDueDateSaving(true)
+    setDueDateError('')
+    setDueDateSuccess(false)
+    try {
+      const iso = newDueDate ? new Date(newDueDate).toISOString() : null
+      const updated = await updateDueDate(id, iso)
+      setDemand(prev => ({ ...prev, dueDate: updated.dueDate, isOverdue: updated.isOverdue }))
+      setDueDateSuccess(true)
+      setShowDueDate(false)
+      setTimeout(() => setDueDateSuccess(false), 2500)
+    } catch (err) {
+      const msg = err.response?.data?.error?.message
+      setDueDateError(msg || 'Não foi possível atualizar o prazo.')
+    } finally {
+      setDueDateSaving(false)
+    }
+  }
+
   async function handleSubtask(subtaskId, completed) {
     setSubtaskLoading(subtaskId)
     setStatusError('')
@@ -112,7 +140,7 @@ export default function DemandDetail() {
     }
   }
 
-  const companyName    = state?.companyName    ?? demand?.companyId ?? '—'
+  const companyName    = state?.companyName    ?? '—'
   const demandTypeName = state?.demandTypeName ?? '—'
   const st = demand ? (STATUS_MAP[demand.status] ?? { label: demand.status, cls: 'pending' }) : null
 
@@ -198,8 +226,74 @@ export default function DemandDetail() {
               </div>
               <div className="detail-row">
                 <span className="detail-key">Vencimento</span>
-                <span className="detail-val">{formatDate(demand.dueDate)}</span>
+                <span className="detail-val" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  {demand.isOverdue
+                    ? <span className="badge b-red">Atrasada — {formatDate(demand.dueDate)}</span>
+                    : formatDate(demand.dueDate)}
+                  {isAdmin && (
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: 12, padding: '2px 10px', height: 26 }}
+                      onClick={() => {
+                        setNewDueDate(demand.dueDate ? demand.dueDate.slice(0, 10) : '')
+                        setDueDateError('')
+                        setShowDueDate(v => !v)
+                      }}
+                    >
+                      {demand.dueDate ? 'Alterar prazo' : 'Definir prazo'}
+                    </button>
+                  )}
+                </span>
               </div>
+
+              {showDueDate && isAdmin && (
+                <div style={{ background: '#F9FAFB', borderRadius: 8, padding: '14px 16px', marginBottom: 8 }}>
+                  {dueDateError && (
+                    <div className="alert-error" style={{ marginBottom: 10, fontSize: 13 }}>
+                      <Icon name="warning" size={16} /> {dueDateError}
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    <input
+                      type="date"
+                      className="form-input"
+                      style={{ height: 38, width: 180 }}
+                      value={newDueDate}
+                      onChange={e => setNewDueDate(e.target.value)}
+                    />
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={handleDueDateSave}
+                      disabled={dueDateSaving}
+                    >
+                      {dueDateSaving ? <span className="spinner" /> : 'Salvar'}
+                    </button>
+                    {demand.dueDate && (
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        style={{ color: '#DC2626', borderColor: '#FCA5A5' }}
+                        onClick={() => { setNewDueDate(''); handleDueDateSave() }}
+                        disabled={dueDateSaving}
+                      >
+                        Remover
+                      </button>
+                    )}
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => setShowDueDate(false)}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {dueDateSuccess && (
+                <div className="alert-info" style={{ marginBottom: 8 }}>
+                  <Icon name="checkCircle" size={16} fill={1} /> Prazo atualizado com sucesso.
+                </div>
+              )}
+
               <div className="detail-row">
                 <span className="detail-key">Status</span>
                 <span className="detail-val">

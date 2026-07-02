@@ -6,14 +6,14 @@ import { updateUser } from '../api/userService'
 
 const ROLES = [
   { value: 'admin',    label: 'Administrador' },
-  { value: 'pessoal',  label: 'Colaborador — Pessoal' },
-  { value: 'fiscal',   label: 'Colaborador — Fiscal' },
-  { value: 'contabil', label: 'Colaborador — Contábil + Fiscal' },
+  { value: 'Fiscal',   label: 'Colaborador — Fiscal' },
+  { value: 'DP',       label: 'Colaborador — Departamento Pessoal' },
+  { value: 'Contábil', label: 'Colaborador — Contábil' },
 ]
 
 function roleFromUser(user) {
   if (user?.role === 'admin') return 'admin'
-  return user?.sector || 'pessoal'
+  return user?.sector || 'Fiscal'
 }
 
 export default function EditUser() {

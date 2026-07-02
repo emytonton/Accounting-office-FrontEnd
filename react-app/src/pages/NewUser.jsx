@@ -7,9 +7,9 @@ import { useAuth } from '../context/AuthContext'
 
 const ROLES = [
   { value: 'admin',    label: 'Administrador' },
-  { value: 'pessoal',  label: 'Colaborador — Pessoal' },
-  { value: 'fiscal',   label: 'Colaborador — Fiscal' },
-  { value: 'contabil', label: 'Colaborador — Contábil + Fiscal' },
+  { value: 'Fiscal',   label: 'Colaborador — Fiscal' },
+  { value: 'DP',       label: 'Colaborador — Departamento Pessoal' },
+  { value: 'Contábil', label: 'Colaborador — Contábil' },
 ]
 
 export default function NewUser() {
@@ -18,7 +18,7 @@ export default function NewUser() {
 
   const [name, setName] = useState('')
   const [identifier, setIdentifier] = useState('')
-  const [role, setRole] = useState('pessoal')
+  const [role, setRole] = useState('Fiscal')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -38,6 +38,7 @@ export default function NewUser() {
     setLoading(true)
     try {
       const isAdmin = role === 'admin'
+
       const payload = {
         tenantId: currentUser?.tenantId,
         name: name.trim(),

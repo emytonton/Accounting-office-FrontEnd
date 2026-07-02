@@ -12,8 +12,8 @@ const MONTH_NAMES = [
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
 ]
 
-const SECTOR_LABELS = { fiscal: 'Fiscal', pessoal: 'Pessoal', contabil: 'Contábil', dp: 'DP' }
-const SECTOR_BADGE  = { fiscal: 'b-orange', pessoal: 'b-blue', contabil: 'b-purple', dp: 'b-blue' }
+const SECTOR_LABELS = { Fiscal: 'Fiscal', DP: 'Pessoal', 'Contábil': 'Contábil' }
+const SECTOR_BADGE  = { Fiscal: 'b-orange', DP: 'b-blue', 'Contábil': 'b-purple' }
 
 function getCompetenceOptions() {
   const now = new Date()
@@ -261,7 +261,7 @@ export default function Dashboard() {
 
                 {overdueDemands.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: 32, color: '#9CA3AF', fontSize: 14 }}>
-                    Nenhuma demanda em atraso nesta competência 🎉
+                    Nenhuma demanda em atraso nesta competência.
                   </div>
                 ) : (
                   <table>

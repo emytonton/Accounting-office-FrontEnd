@@ -24,3 +24,8 @@ export async function updateSubtask(demandId, subtaskId, completed) {
   const { data } = await api.patch(`/demands/${demandId}/subtasks/${subtaskId}`, { completed })
   return data.data
 }
+
+export async function updateDueDate(id, dueDate) {
+  const { data } = await api.patch(`/demands/${id}/due-date`, { dueDate })
+  return data.data
+}
