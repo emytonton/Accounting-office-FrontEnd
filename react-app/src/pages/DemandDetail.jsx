@@ -3,6 +3,8 @@ import { useParams, useLocation, Link } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { Icon } from '../components/icons'
 import { getDemand, updateDemandStatus, updateSubtask, updateDueDate } from '../api/demandService'
+import { getCompany } from '../api/companyService'
+import { getDemandType } from '../api/demandTypeService'
 import { useAuth } from '../context/AuthContext'
 
 const MONTHS = [
@@ -39,6 +41,9 @@ export default function DemandDetail() {
   const [loading, setLoading]     = useState(true)
   const [error, setError]         = useState('')
 
+  const [fetchedCompanyName, setFetchedCompanyName]       = useState('')
+  const [fetchedDemandTypeName, setFetchedDemandTypeName] = useState('')
+
   const [newStatus, setNewStatus]       = useState('')
   const [statusSaving, setStatusSaving] = useState(false)
   const [statusError, setStatusError]   = useState('')
@@ -59,6 +64,15 @@ export default function DemandDetail() {
       const data = await getDemand(id)
       setDemand(data)
       setNewStatus(data.status)
+
+      // Se a página foi acessada direto (sem state de navegação), resolve os
+      // nomes de empresa e tipo de demanda a partir dos IDs.
+      if (!state?.companyName && data.companyId) {
+        getCompany(data.companyId).then(c => setFetchedCompanyName(c?.name ?? '')).catch(() => {})
+      }
+      if (!state?.demandTypeName && data.demandTypeId) {
+        getDemandType(data.demandTypeId).then(t => setFetchedDemandTypeName(t?.name ?? '')).catch(() => {})
+      }
     } catch {
       setError('Não foi possível carregar a demanda. Tente novamente.')
     } finally {
@@ -140,8 +154,8 @@ export default function DemandDetail() {
     }
   }
 
-  const companyName    = state?.companyName    ?? '—'
-  const demandTypeName = state?.demandTypeName ?? '—'
+  const companyName    = state?.companyName    || fetchedCompanyName    || '—'
+  const demandTypeName = state?.demandTypeName || fetchedDemandTypeName || '—'
   const st = demand ? (STATUS_MAP[demand.status] ?? { label: demand.status, cls: 'pending' }) : null
 
   const sortedSubtasks = demand?.subtasks

@@ -164,7 +164,7 @@ export default function Receipts() {
     try {
       const [receiptsData, companiesData] = await Promise.all([
         listReceipts(user.tenantId),
-        listCompanies(user.tenantId, { situation: 'active' }),
+        listCompanies(user.tenantId, { limit: 1000 }),
       ])
       setReceipts(Array.isArray(receiptsData) ? receiptsData : (receiptsData.items ?? []))
       setCompanies(companiesData.items ?? (Array.isArray(companiesData) ? companiesData : []))
@@ -207,8 +207,11 @@ export default function Receipts() {
   })
 
   function companyName(companyId) {
-    return companies.find(c => c.id === companyId)?.name ?? companyId?.slice(0, 8) + '…'
+    return companies.find(c => c.id === companyId)?.name ?? '—'
   }
+
+  // Recibos só podem ser emitidos para empresas ativas (RN-003).
+  const activeCompanies = companies.filter(c => c.isActive !== false)
 
   return (
     <div className="app-layout">
@@ -359,7 +362,7 @@ export default function Receipts() {
 
       {showNewModal && (
         <NewReceiptModal
-          companies={companies}
+          companies={activeCompanies}
           tenantId={user.tenantId}
           onClose={() => setShowNewModal(false)}
           onCreated={() => { setShowNewModal(false); loadData() }}
