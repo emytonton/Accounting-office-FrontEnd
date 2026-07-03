@@ -240,6 +240,11 @@ export default function ReceiptDetail() {
   const [pdfLoading, setPdfLoading]           = useState(false)
   const [pdf2vLoading, setPdf2vLoading]       = useState(false)
 
+  // RN-012: módulo de honorários é exclusivo do administrador.
+  useEffect(() => {
+    if (user && user.role !== 'admin') navigate('/dashboard', { replace: true })
+  }, [user])
+
   useEffect(() => { loadAll() }, [id])
 
   async function loadAll() {

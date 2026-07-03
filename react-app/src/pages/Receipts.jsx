@@ -154,6 +154,11 @@ export default function Receipts() {
   const [showNewModal, setShowNewModal]     = useState(false)
   const [downloadingId, setDownloadingId]   = useState(null)
 
+  // RN-012: módulo de honorários é exclusivo do administrador.
+  useEffect(() => {
+    if (user && user.role !== 'admin') navigate('/dashboard', { replace: true })
+  }, [user])
+
   useEffect(() => {
     loadData()
   }, [])

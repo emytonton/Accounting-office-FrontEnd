@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation, useParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { Icon } from '../components/icons'
 import { updateCompany } from '../api/companyService'
+import { useAuth } from '../context/AuthContext'
 import { SECTORS as SECTOR_OPTIONS, normalizeSector } from '../constants/sectors'
 
 const SECTORS = [{ value: '', label: 'Nenhum' }, ...SECTOR_OPTIONS]
@@ -24,6 +25,7 @@ export default function EditCompany() {
   const navigate = useNavigate()
   const { id } = useParams()
   const { state } = useLocation()
+  const { user: currentUser } = useAuth()
   const companyData = state?.company ?? {}
 
   const [name, setName]     = useState(companyData.name ?? '')
@@ -31,6 +33,11 @@ export default function EditCompany() {
   const [sector, setSector] = useState(normalizeSector(companyData.sector) ?? '')
   const [loading, setLoading] = useState(false)
   const [error, setError]   = useState('')
+
+  // UC-E01: apenas administrador edita empresas.
+  useEffect(() => {
+    if (currentUser && currentUser.role !== 'admin') navigate('/empresas', { replace: true })
+  }, [currentUser])
 
   function handleCnpjChange(e) {
     setCnpj(maskCNPJ(e.target.value))

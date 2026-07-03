@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { Icon } from '../components/icons'
@@ -22,6 +22,11 @@ export default function NewUser() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+
+  // RN-002: apenas administrador cadastra usuários.
+  useEffect(() => {
+    if (currentUser && currentUser.role !== 'admin') navigate('/dashboard', { replace: true })
+  }, [currentUser])
 
   function validate() {
     if (!name.trim()) return 'Informe o nome completo.'

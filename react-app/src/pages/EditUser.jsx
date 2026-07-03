@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation, useParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { Icon } from '../components/icons'
 import { updateUser } from '../api/userService'
+import { useAuth } from '../context/AuthContext'
 
 const ROLES = [
   { value: 'admin',    label: 'Administrador' },
@@ -20,7 +21,13 @@ export default function EditUser() {
   const navigate = useNavigate()
   const { id } = useParams()
   const { state } = useLocation()
+  const { user: currentUser } = useAuth()
   const userData = state?.user ?? {}
+
+  // RN-002: apenas administrador edita usuários.
+  useEffect(() => {
+    if (currentUser && currentUser.role !== 'admin') navigate('/dashboard', { replace: true })
+  }, [currentUser])
 
   const [name, setName]             = useState(userData.name ?? '')
   const [identifier, setIdentifier] = useState(userData.identifier ?? '')

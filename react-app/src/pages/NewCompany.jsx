@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { Icon } from '../components/icons'
@@ -32,6 +32,11 @@ export default function NewCompany() {
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
   const [success, setSuccess] = useState(false)
+
+  // UC-E01: apenas administrador cadastra empresas.
+  useEffect(() => {
+    if (currentUser && currentUser.role !== 'admin') navigate('/empresas', { replace: true })
+  }, [currentUser])
 
   function handleCnpjChange(e) {
     setCnpj(maskCNPJ(e.target.value))

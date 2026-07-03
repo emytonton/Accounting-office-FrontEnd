@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { label: 'Recibos',          to: '/recibos',       iconName: 'receipt',    adminOnly: true },
   { label: 'Exportar',         to: '/exportar',      iconName: 'exportData', adminOnly: true },
   { label: 'Auditoria',        to: '/auditoria',     iconName: 'audit',      adminOnly: true },
-  { label: 'Usuários',         to: '/usuarios',      iconName: 'users' },
+  { label: 'Usuários',         to: '/usuarios',      iconName: 'users',      adminOnly: true },
 ]
 
 export default function Sidebar() {

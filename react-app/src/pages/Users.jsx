@@ -36,6 +36,11 @@ export default function Users() {
   const [page, setPage] = useState(1)
   const [actionLoading, setActionLoading] = useState(null)
 
+  // RN-002: gestão de usuários é exclusiva do administrador.
+  useEffect(() => {
+    if (user && user.role !== 'admin') navigate('/dashboard', { replace: true })
+  }, [user])
+
   useEffect(() => {
     async function fetchUsers() {
       setLoading(true)
