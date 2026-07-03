@@ -6,13 +6,7 @@ import {
   listDemandTypes, createDemandType, updateDemandType,
   addSubtaskTemplate, removeSubtaskTemplate,
 } from '../api/demandTypeService'
-
-const SECTORS = [
-  { value: 'fiscal',   label: 'Fiscal' },
-  { value: 'pessoal',  label: 'Pessoal' },
-  { value: 'contabil', label: 'Contábil' },
-]
-const SECTOR_LABEL = { fiscal: 'Fiscal', pessoal: 'Pessoal', contabil: 'Contábil' }
+import { SECTORS, normalizeSector, sectorLabel, sectorBadge } from '../constants/sectors'
 
 let _keyCounter = 0
 function newKey() { return ++_keyCounter }
@@ -24,7 +18,7 @@ function emptyTemplate() {
 function DemandTypeModal({ initial, onClose, onSaved }) {
   const isEdit = !!initial
 
-  const [sector, setSector]           = useState(initial?.sector ?? 'fiscal')
+  const [sector, setSector]           = useState(normalizeSector(initial?.sector) ?? 'Fiscal')
   const [name, setName]               = useState(initial?.name ?? '')
   const [hasSubtasks, setHasSubtasks] = useState(initial?.hasSubtasks ?? false)
   const [isActive, setIsActive]       = useState(initial?.isActive ?? true)
@@ -228,7 +222,7 @@ export default function DemandTypes() {
 
   const filtered = useMemo(() => {
     return types.filter(t => {
-      const matchSector = !activeTab || t.sector === activeTab
+      const matchSector = !activeTab || normalizeSector(t.sector) === activeTab
       const matchActive = !filterActive || t.isActive === (filterActive === 'true')
       return matchSector && matchActive
     })
@@ -307,13 +301,12 @@ export default function DemandTypes() {
                     </td>
                   </tr>
                 ) : filtered.map(t => {
-                  const sectorBadge = { fiscal: 'b-orange', pessoal: 'b-blue', contabil: 'b-purple' }
                   return (
                     <tr key={t.id}>
                       <td className="fw">{t.name}</td>
                       <td>
-                        <span className={`badge ${sectorBadge[t.sector] ?? 'b-gray'}`}>
-                          {SECTOR_LABEL[t.sector] ?? t.sector}
+                        <span className={`badge ${sectorBadge(t.sector)}`}>
+                          {sectorLabel(t.sector)}
                         </span>
                       </td>
                       <td>

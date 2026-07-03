@@ -4,14 +4,9 @@ import Sidebar from '../components/Sidebar'
 import { Icon } from '../components/icons'
 import { listCompanies, inactivateCompany } from '../api/companyService'
 import { useAuth } from '../context/AuthContext'
+import { SECTORS, normalizeSector, sectorLabel, sectorBadge } from '../constants/sectors'
 
 const PAGE_SIZE = 10
-
-const SECTOR_MAP = {
-  fiscal:   { label: 'Fiscal',   cls: 'b-orange' },
-  pessoal:  { label: 'Pessoal',  cls: 'b-blue' },
-  contabil: { label: 'Contábil', cls: 'b-purple' },
-}
 
 function formatCNPJ(cnpj) {
   if (!cnpj) return '—'
@@ -126,7 +121,7 @@ export default function Companies() {
     return companies.filter(c => {
       const matchSearch    = !q || c.name?.toLowerCase().includes(q) || (rawQ && c.cnpj?.includes(rawQ))
       const matchSituation = !filterSituation || c.isActive === (filterSituation === 'active')
-      const matchSector    = !filterSector || c.sector === filterSector
+      const matchSector    = !filterSector || normalizeSector(c.sector) === filterSector
       return matchSearch && matchSituation && matchSector
     })
   }, [companies, search, filterSituation, filterSector])
@@ -175,9 +170,7 @@ export default function Companies() {
             </select>
             <select className="fi fi-w" value={filterSector} onChange={handleSectorChange}>
               <option value="">Todos os setores</option>
-              <option value="fiscal">Fiscal</option>
-              <option value="pessoal">Pessoal</option>
-              <option value="contabil">Contábil</option>
+              {SECTORS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
 
@@ -213,15 +206,14 @@ export default function Companies() {
                   </tr>
                 ) : (
                   paginated.map(c => {
-                    const sector   = SECTOR_MAP[c.sector]
                     const isActive = c.isActive !== false
                     return (
                       <tr key={c.id}>
                         <td className="fw">{c.name}</td>
                         <td>{formatCNPJ(c.cnpj)}</td>
                         <td>
-                          {sector
-                            ? <span className={`badge ${sector.cls}`}>{sector.label}</span>
+                          {c.sector
+                            ? <span className={`badge ${sectorBadge(c.sector)}`}>{sectorLabel(c.sector)}</span>
                             : <span style={{ color: '#9CA3AF' }}>—</span>}
                         </td>
                         <td>

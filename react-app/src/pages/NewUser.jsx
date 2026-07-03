@@ -82,7 +82,7 @@ export default function NewUser() {
                 Ele poderá acessar o sistema e definir sua senha no primeiro login.
               </p>
               <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
-                <button className="btn btn-secondary" onClick={() => { setSuccess(false); setName(''); setIdentifier(''); setRole('pessoal') }}>
+                <button className="btn btn-secondary" onClick={() => { setSuccess(false); setName(''); setIdentifier(''); setRole('Fiscal') }}>
                   Cadastrar outro
                 </button>
                 <button className="btn btn-primary" onClick={() => navigate('/usuarios')}>

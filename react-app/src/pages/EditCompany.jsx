@@ -3,13 +3,9 @@ import { Link, useNavigate, useLocation, useParams } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { Icon } from '../components/icons'
 import { updateCompany } from '../api/companyService'
+import { SECTORS as SECTOR_OPTIONS, normalizeSector } from '../constants/sectors'
 
-const SECTORS = [
-  { value: '',         label: 'Nenhum' },
-  { value: 'fiscal',   label: 'Fiscal' },
-  { value: 'pessoal',  label: 'Pessoal' },
-  { value: 'contabil', label: 'Contábil' },
-]
+const SECTORS = [{ value: '', label: 'Nenhum' }, ...SECTOR_OPTIONS]
 
 function maskCNPJ(value) {
   const digits = value.replace(/\D/g, '').slice(0, 14)
@@ -32,7 +28,7 @@ export default function EditCompany() {
 
   const [name, setName]     = useState(companyData.name ?? '')
   const [cnpj, setCnpj]     = useState(maskCNPJ(companyData.cnpj ?? ''))
-  const [sector, setSector] = useState(companyData.sector ?? '')
+  const [sector, setSector] = useState(normalizeSector(companyData.sector) ?? '')
   const [loading, setLoading] = useState(false)
   const [error, setError]   = useState('')
 

@@ -4,13 +4,9 @@ import Sidebar from '../components/Sidebar'
 import { Icon } from '../components/icons'
 import { createCompany } from '../api/companyService'
 import { useAuth } from '../context/AuthContext'
+import { SECTORS as SECTOR_OPTIONS } from '../constants/sectors'
 
-const SECTORS = [
-  { value: '',        label: 'Nenhum' },
-  { value: 'fiscal',  label: 'Fiscal' },
-  { value: 'pessoal', label: 'Pessoal' },
-  { value: 'contabil',label: 'Contábil' },
-]
+const SECTORS = [{ value: '', label: 'Nenhum' }, ...SECTOR_OPTIONS]
 
 function maskCNPJ(value) {
   const digits = value.replace(/\D/g, '').slice(0, 14)

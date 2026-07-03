@@ -5,20 +5,17 @@ import { Icon } from '../components/icons'
 import { useAuth } from '../context/AuthContext'
 import { getLinksCatalog, createLink, updateLink, deleteLink } from '../api/demandLinkService'
 import { getCompany } from '../api/companyService'
-
-const SECTOR_LABEL = { fiscal: 'Fiscal', pessoal: 'Pessoal', contabil: 'Contábil' }
-const SECTOR_BADGE = { fiscal: 'b-orange', pessoal: 'b-blue', contabil: 'b-purple' }
-const SECTOR_ORDER = ['fiscal', 'pessoal', 'contabil']
+import { SECTOR_ORDER, normalizeSector, sectorLabel, sectorBadge } from '../constants/sectors'
 
 function groupBySector(catalog) {
   const known = SECTOR_ORDER.reduce((acc, sector) => {
-    const items = catalog.filter(c => c.sector === sector)
+    const items = catalog.filter(c => normalizeSector(c.sector) === sector)
     if (items.length > 0) acc.push({ sector, items })
     return acc
   }, [])
   const knownSet = new Set(SECTOR_ORDER)
   const otherSectors = [...new Set(
-    catalog.filter(c => !knownSet.has(c.sector)).map(c => c.sector)
+    catalog.filter(c => !knownSet.has(normalizeSector(c.sector))).map(c => c.sector)
   )]
   otherSectors.forEach(sector => {
     const items = catalog.filter(c => c.sector === sector)
@@ -160,8 +157,8 @@ export default function CompanyLinks() {
                   return (
                     <div key={sector} className="vinculo-sector-group">
                       <div className="vinculo-sector-title">
-                        <span className={`badge ${SECTOR_BADGE[sector] ?? 'b-gray'}`} style={{ marginRight: 8 }}>
-                          {SECTOR_LABEL[sector] ?? sector}
+                        <span className={`badge ${sectorBadge(sector)}`} style={{ marginRight: 8 }}>
+                          {sectorLabel(sector)}
                         </span>
                         <span style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 400 }}>
                           {linkedInSector}/{items.length} vinculados
