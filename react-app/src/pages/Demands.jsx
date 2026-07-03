@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import { Icon } from '../components/icons'
 import { useAuth } from '../context/AuthContext'
-import { listDemands, openCompetence } from '../api/demandService'
+import { listDemands, openCompetence, deleteDemand } from '../api/demandService'
 import { listCompanies } from '../api/companyService'
 import {
   listDemandTypes, createDemandType, updateDemandType,
@@ -360,6 +360,8 @@ export default function Demands() {
   const [loading, setLoading]           = useState(true)
   const [error, setError]               = useState('')
   const [showOpenModal, setShowOpenModal] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState(null)   // demanda a excluir
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   /* Tipos tab state */
   const [types, setTypes]               = useState([])
@@ -418,6 +420,24 @@ export default function Demands() {
   }
 
   useEffect(() => { loadDemands() }, [filterMonth, filterYear, filterStatus])
+
+  /* Exclui a demanda selecionada (admin) */
+  async function handleDelete() {
+    if (!deleteTarget) return
+    setDeleteLoading(true)
+    setError('')
+    try {
+      await deleteDemand(deleteTarget.id)
+      setDemands(prev => prev.filter(d => d.id !== deleteTarget.id))
+      setDeleteTarget(null)
+    } catch (err) {
+      const msg = err.response?.data?.error?.message
+      setError(msg || 'Não foi possível excluir a demanda. Tente novamente.')
+      setDeleteTarget(null)
+    } finally {
+      setDeleteLoading(false)
+    }
+  }
 
   /* Reload types after create/update */
   async function reloadTypes() {
@@ -632,6 +652,19 @@ export default function Demands() {
                               >
                                 <Icon name="viewDetail" size={15} />
                               </button>
+                              {isAdmin && (
+                                <button
+                                  className="ic-btn ic-del"
+                                  title="Excluir demanda"
+                                  onClick={() => setDeleteTarget({
+                                    id: d.id,
+                                    company: companiesMap[d.companyId] ?? '—',
+                                    type: typesMap[d.demandTypeId]?.name ?? '—',
+                                  })}
+                                >
+                                  <Icon name="delete" size={15} />
+                                </button>
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -762,6 +795,31 @@ export default function Demands() {
           onClose={() => setModal(null)}
           onSaved={() => { setModal(null); reloadTypes() }}
         />
+      )}
+
+      {deleteTarget && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setDeleteTarget(null)}>
+          <div className="modal-box">
+            <div className="modal-header">
+              <h2 className="modal-title">Excluir demanda</h2>
+            </div>
+            <p className="modal-desc">
+              Tem certeza que deseja excluir a demanda <strong>{deleteTarget.type}</strong> da empresa{' '}
+              <strong>{deleteTarget.company}</strong>?
+            </p>
+            <p className="modal-desc" style={{ color: '#DC2626', marginTop: -8 }}>
+              Esta ação é permanente e será registrada na auditoria.
+            </p>
+            <div className="modal-actions">
+              <button className="btn btn-secondary" onClick={() => setDeleteTarget(null)} disabled={deleteLoading}>
+                Cancelar
+              </button>
+              <button className="btn btn-danger" onClick={handleDelete} disabled={deleteLoading}>
+                {deleteLoading ? <><span className="spinner" style={{ borderColor: 'rgba(220,38,38,0.3)', borderTopColor: '#DC2626' }} /> Excluindo…</> : 'Excluir demanda'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

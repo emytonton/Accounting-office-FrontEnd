@@ -29,3 +29,8 @@ export async function updateDueDate(id, dueDate) {
   const { data } = await api.patch(`/demands/${id}/due-date`, { dueDate })
   return data.data
 }
+
+export async function deleteDemand(id) {
+  const { data } = await api.delete(`/demands/${id}`)
+  return data.data
+}

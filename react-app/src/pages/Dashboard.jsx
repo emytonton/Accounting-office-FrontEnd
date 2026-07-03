@@ -15,6 +15,7 @@ const MONTH_NAMES = [
 
 const SECTOR_LABELS = { Fiscal: 'Fiscal', DP: 'Pessoal', 'Contábil': 'Contábil' }
 const SECTOR_BADGE  = { Fiscal: 'b-orange', DP: 'b-blue', 'Contábil': 'b-purple' }
+const SECTOR_COLOR  = { Fiscal: '#F97316', DP: '#2643FF', 'Contábil': '#7C3AED' }
 
 function getCompetenceOptions() {
   const now = new Date()
@@ -166,7 +167,7 @@ export default function Dashboard() {
                   <div className="stat-sub">nesta competência</div>
                 </div>
                 <div className="stat-card" style={{ borderTop: '3px solid #7C3AED' }}>
-                  <div className="stat-label">⚡ Risco de Prazo</div>
+                  <div className="stat-label">Risco de Prazo</div>
                   <div className="stat-value" style={{ color: '#7C3AED' }}>{atRisk}</div>
                   <div className="stat-sub">prazo nos próximos 7 dias</div>
                 </div>
@@ -183,23 +184,54 @@ export default function Dashboard() {
                     <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF', fontSize: 13 }}>
                       Nenhuma demanda nesta competência
                     </div>
-                  ) : (
-                    <div className="bar-chart">
-                      {bySector.map((s, i) => (
-                        <div className="bar-wrap" key={s.key}>
-                          <div className="bar-val">{s.counts.total}</div>
-                          <div
-                            className="bar"
-                            style={{
-                              height: Math.max(8, Math.round((s.counts.total / maxSectorCount) * 95)),
-                              opacity: 1 - i * 0.15,
-                            }}
-                          />
-                          <div className="bar-lbl">{SECTOR_LABELS[s.key] ?? s.key}</div>
+                  ) : (() => {
+                    const PLOT_H = 170
+                    const totalAll = bySector.reduce((s, x) => s + x.counts.total, 0)
+                    return (
+                      <div style={{ display: 'flex', alignItems: 'stretch', gap: 10, marginTop: 8 }}>
+                        {/* Eixo Y */}
+                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                          height: PLOT_H, paddingBottom: 22, fontSize: 11, color: '#9CA3AF', textAlign: 'right', minWidth: 20 }}>
+                          <span>{maxSectorCount}</span>
+                          <span>{Math.round(maxSectorCount / 2)}</span>
+                          <span>0</span>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                        {/* Área do gráfico */}
+                        <div style={{ position: 'relative', flex: 1, height: PLOT_H }}>
+                          {/* Linhas de grade */}
+                          {[0, 0.5, 1].map(g => (
+                            <div key={g} style={{ position: 'absolute', left: 0, right: 0, bottom: 22 + g * (PLOT_H - 22),
+                              borderTop: '1px dashed #EEF0F4', height: 0 }} />
+                          ))}
+                          {/* Barras */}
+                          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end',
+                            justifyContent: 'space-around', gap: 8 }}>
+                            {bySector.map(s => {
+                              const color = SECTOR_COLOR[s.key] ?? '#2643FF'
+                              const h = Math.max(6, Math.round((s.counts.total / maxSectorCount) * (PLOT_H - 34))) + 12
+                              const pct = totalAll > 0 ? Math.round((s.counts.total / totalAll) * 100) : 0
+                              return (
+                                <div key={s.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                  flex: 1, maxWidth: 90, height: '100%', justifyContent: 'flex-end' }}>
+                                  <div style={{ fontSize: 15, fontWeight: 700, color: '#1E2939', marginBottom: 4 }}>
+                                    {s.counts.total}
+                                  </div>
+                                  <div title={`${s.counts.total} demandas (${pct}%)`}
+                                    style={{ width: '100%', maxWidth: 54, height: h, borderRadius: '8px 8px 0 0',
+                                      background: `linear-gradient(180deg, ${color} 0%, ${color}CC 100%)`,
+                                      boxShadow: `0 2px 6px ${color}33`, transition: 'height .4s ease' }} />
+                                  <div style={{ marginTop: 8, fontSize: 12, fontWeight: 600, color: '#4A5565' }}>
+                                    {SECTOR_LABELS[s.key] ?? s.key}
+                                  </div>
+                                  <div style={{ fontSize: 11, color: '#9CA3AF' }}>{pct}%</div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })()}
                 </div>
 
                 {/* Donut Chart — Recebimentos */}

@@ -164,20 +164,21 @@ function CancelModal({ receipt, onClose, onCancelled }) {
   const [reason, setReason]   = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
+  const [needsForce, setNeedsForce] = useState(false)  // recibo tem pagamentos → exige confirmação extra
 
-  async function handleSubmit(e) {
-    e.preventDefault()
+  async function doCancel(force) {
     if (!reason.trim()) { setError('Informe o motivo do cancelamento.'); return }
     setLoading(true)
     setError('')
     try {
-      await cancelReceipt(receipt.id, reason.trim())
+      await cancelReceipt(receipt.id, reason.trim(), force)
       onCancelled()
     } catch (err) {
       const code = err.response?.data?.error?.code
       const msg  = err.response?.data?.error?.message
       if (code === 'RECEIPT_HAS_PAYMENTS') {
-        setError('Este recibo possui pagamentos registrados. Use "forçar" para cancelar mesmo assim.')
+        setNeedsForce(true)
+        setError('')
       } else {
         setError(msg || 'Não foi possível cancelar o recibo.')
       }
@@ -200,7 +201,18 @@ function CancelModal({ receipt, onClose, onCancelled }) {
             <Icon name="warning" size={16} /> {error}
           </div>
         )}
-        <form onSubmit={handleSubmit}>
+
+        {needsForce && (
+          <div className="alert-error" style={{ margin: '0 0 14px', background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#991B1B' }}>
+            <Icon name="warning" size={16} />
+            <span>
+              <strong>Este recibo já possui pagamentos registrados.</strong><br />
+              Cancelar mesmo assim vai invalidar o recibo <u>sem apagar os pagamentos</u> — o histórico financeiro é preservado, mas o recibo deixa de valer como comprovante. Confirme apenas se foi um erro de emissão.
+            </span>
+          </div>
+        )}
+
+        <form onSubmit={e => { e.preventDefault(); doCancel(needsForce) }}>
           <div className="form-group">
             <label>Motivo do cancelamento <span className="required">*</span></label>
             <input
@@ -209,13 +221,16 @@ function CancelModal({ receipt, onClose, onCancelled }) {
               placeholder="Ex: Erro no valor emitido"
               value={reason}
               onChange={e => setReason(e.target.value)}
+              disabled={loading}
             />
           </div>
           <div className="form-actions" style={{ marginTop: 20 }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose}>Voltar</button>
+            <button type="button" className="btn btn-secondary" onClick={onClose} disabled={loading}>Voltar</button>
             <button type="submit" className="btn btn-primary" disabled={loading}
               style={{ background: '#DC2626', borderColor: '#DC2626' }}>
-              {loading ? <><span className="spinner" /> Cancelando…</> : 'Confirmar cancelamento'}
+              {loading
+                ? <><span className="spinner" /> Cancelando…</>
+                : needsForce ? 'Forçar cancelamento' : 'Confirmar cancelamento'}
             </button>
           </div>
         </form>

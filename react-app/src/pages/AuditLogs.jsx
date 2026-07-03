@@ -9,6 +9,7 @@ const ACTION_LABELS = {
   'competence.opened':                  'Competência aberta',
   'demand.status_changed':              'Status de demanda alterado',
   'demand.due_date_updated':            'Prazo de demanda definido',
+  'demand.deleted':                     'Demanda excluída',
   'subtask.completed':                  'Subtarefa concluída',
   'subtask.reopened':                   'Subtarefa reaberta',
   'company_demand_type_link.created':   'Vínculo criado',
