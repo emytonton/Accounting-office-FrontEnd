@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { Icon } from '../components/icons'
 import { useAuth } from '../context/AuthContext'
@@ -26,10 +26,12 @@ export default function Export() {
   const [error, setError]       = useState('')
   const [lastExport, setLastExport] = useState(null)
 
-  if (user?.role !== 'admin') {
-    navigate('/dashboard', { replace: true })
-    return null
-  }
+  // UC-M01: exportação é exclusiva do administrador.
+  useEffect(() => {
+    if (user && user.role !== 'admin') navigate('/dashboard', { replace: true })
+  }, [user])
+
+  if (user && user.role !== 'admin') return null
 
   async function handleExport() {
     setLoading(true)
