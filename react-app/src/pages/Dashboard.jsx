@@ -70,7 +70,7 @@ export default function Dashboard() {
 
       if (sRes.status === 'fulfilled') setStats(sRes.value)
       if (cRes.status === 'fulfilled') setCompanies(cRes.value?.items ?? [])
-      if (dRes.status === 'fulfilled') setDemands(dRes.value?.items ?? [])
+      if (dRes.status === 'fulfilled') setDemands(Array.isArray(dRes.value) ? dRes.value : dRes.value?.items ?? [])
       if (rRes.status === 'fulfilled') setReceipts(rRes.value?.items ?? rRes.value ?? [])
       if (tRes.status === 'fulfilled') setTypes(tRes.value?.items ?? tRes.value ?? [])
       setLoading(false)
