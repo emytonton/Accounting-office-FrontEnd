@@ -167,7 +167,7 @@ function OpenCompetenceModal({ onClose, onOpened }) {
 function DemandTypeModal({ initial, onClose, onSaved }) {
   const isEdit = !!initial
 
-  const [sector, setSector]           = useState(initial?.sector ?? 'fiscal')
+  const [sector, setSector]           = useState(initial?.sector ?? 'Fiscal')
   const [name, setName]               = useState(initial?.name ?? '')
   const [hasSubtasks, setHasSubtasks] = useState(initial?.hasSubtasks ?? false)
   const [isActive, setIsActive]       = useState(initial?.isActive ?? true)

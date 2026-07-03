@@ -8,24 +8,24 @@ import { useAuth } from '../context/AuthContext'
 const PAGE_SIZE = 10
 
 const PERFIL_MAP = {
-  admin:       { label: 'Administrador',              cls: 'b-purple' },
-  collaborator:{ label: 'Colaborador',                cls: 'b-gray' },
-  fiscal:      { label: 'Colaborador — Fiscal',       cls: 'b-orange' },
-  pessoal:     { label: 'Colaborador — Pessoal',      cls: 'b-blue' },
-  contabil:    { label: 'Colaborador — Contábil',     cls: 'b-green' },
+  admin:    { label: 'Administrador',         cls: 'b-purple' },
+  Fiscal:   { label: 'Colaborador — Fiscal',  cls: 'b-orange' },
+  DP:       { label: 'Colaborador — Pessoal', cls: 'b-blue' },
+  Contábil: { label: 'Colaborador — Contábil',cls: 'b-green' },
+  default:  { label: 'Colaborador',           cls: 'b-gray' },
 }
 
 function perfilInfo(role, sector) {
   if (role === 'admin') return PERFIL_MAP.admin
-  if (sector === 'fiscal') return PERFIL_MAP.fiscal
-  if (sector === 'pessoal') return PERFIL_MAP.pessoal
-  if (sector === 'contabil') return PERFIL_MAP.contabil
-  return PERFIL_MAP.collaborator
+  const s = sector ? sector.charAt(0).toUpperCase() + sector.slice(1) : ''
+  return PERFIL_MAP[sector] ?? PERFIL_MAP[s] ?? PERFIL_MAP.default
 }
 
 export default function Users() {
   const navigate = useNavigate()
   const { user } = useAuth()
+
+  const isAdmin = user?.role === 'admin'
 
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -111,12 +111,14 @@ export default function Users() {
         </div>
 
         <div className="content">
-          <div className="toolbar">
-            <button className="btn btn-primary" onClick={() => navigate('/usuarios/novo')}>
-              <Icon name="add" size={18} />
-              Novo Usuário
-            </button>
-          </div>
+          {isAdmin && (
+            <div className="toolbar">
+              <button className="btn btn-primary" onClick={() => navigate('/usuarios/novo')}>
+                <Icon name="add" size={18} />
+                Novo Usuário
+              </button>
+            </div>
+          )}
 
           <div className="filter-bar">
             <input
@@ -134,9 +136,9 @@ export default function Users() {
             <select className="fi fi-w" value={filterRole} onChange={handleRoleChange}>
               <option value="">Todos os perfis</option>
               <option value="admin">Administrador</option>
-              <option value="pessoal">Colaborador — Pessoal</option>
-              <option value="fiscal">Colaborador — Fiscal</option>
-              <option value="contabil">Colaborador — Contábil + Fiscal</option>
+              <option value="Fiscal">Colaborador — Fiscal</option>
+              <option value="DP">Colaborador — Pessoal</option>
+              <option value="Contábil">Colaborador — Contábil</option>
             </select>
           </div>
 
@@ -154,19 +156,19 @@ export default function Users() {
                   <th>E-mail</th>
                   <th>Perfil / Setor</th>
                   <th>Status</th>
-                  <th>Ações</th>
+                  {isAdmin && <th>Ações</th>}
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={5} style={{ textAlign: 'center', padding: 40 }}>
+                    <td colSpan={isAdmin ? 5 : 4} style={{ textAlign: 'center', padding: 40 }}>
                       <span className="spinner" style={{ borderColor: 'rgba(38,67,255,0.2)', borderTopColor: '#2643FF' }} />
                     </td>
                   </tr>
                 ) : paginated.length === 0 ? (
                   <tr>
-                    <td colSpan={5}>
+                    <td colSpan={isAdmin ? 5 : 4}>
                       <div className="empty-state">Nenhum usuário encontrado.</div>
                     </td>
                   </tr>
@@ -192,36 +194,38 @@ export default function Users() {
                             <span className="badge b-gray">Inativo</span>
                           )}
                         </td>
-                        <td>
-                          <div className="actions">
-                            <button
-                              className="ic-btn ic-edit"
-                              title="Editar"
-                              onClick={() => navigate(`/usuarios/${u.id || u._id}/editar`, { state: { user: u } })}
-                            >
-                              <Icon name="edit" size={15} />
-                            </button>
-                            {isActive ? (
+                        {isAdmin && (
+                          <td>
+                            <div className="actions">
                               <button
-                                className="ic-btn ic-del"
-                                title="Inativar"
-                                disabled={actionLoading === u.id}
-                                onClick={() => handleInactivate(u.id)}
+                                className="ic-btn ic-edit"
+                                title="Editar"
+                                onClick={() => navigate(`/usuarios/${u.id || u._id}/editar`, { state: { user: u } })}
                               >
-                                <Icon name="block" size={15} />
+                                <Icon name="edit" size={15} />
                               </button>
-                            ) : (
-                              <button
-                                className="ic-btn ic-ok"
-                                title="Reativar"
-                                disabled={actionLoading === u.id}
-                                onClick={() => handleReactivate(u.id)}
-                              >
-                                <Icon name="restore" size={15} />
-                              </button>
-                            )}
-                          </div>
-                        </td>
+                              {isActive ? (
+                                <button
+                                  className="ic-btn ic-del"
+                                  title="Inativar"
+                                  disabled={actionLoading === u.id}
+                                  onClick={() => handleInactivate(u.id)}
+                                >
+                                  <Icon name="block" size={15} />
+                                </button>
+                              ) : (
+                                <button
+                                  className="ic-btn ic-ok"
+                                  title="Reativar"
+                                  disabled={actionLoading === u.id}
+                                  onClick={() => handleReactivate(u.id)}
+                                >
+                                  <Icon name="restore" size={15} />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     )
                   })
